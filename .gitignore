@@ -1,0 +1,10 @@
+# Ignorar ficheiros temporários do CLion e CMake
+cmake-build-debug/
+*.json
+*.log
+*.cache
+*.idea/
+*.iml
+
+# Ignorar ficheiros gerados por CMake
+CMakeLists.txt.user
