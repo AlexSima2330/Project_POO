@@ -1,0 +1,3 @@
+C:/Users/Alexa/OneDrive/Documentos/Project_POO/cmake-build-debug/CMakeFiles/Project_POO.dir
+C:/Users/Alexa/OneDrive/Documentos/Project_POO/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Alexa/OneDrive/Documentos/Project_POO/cmake-build-debug/CMakeFiles/rebuild_cache.dir

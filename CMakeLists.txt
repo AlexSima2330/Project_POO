@@ -3,4 +3,16 @@ project(Project_POO)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(Project_POO main.cpp)
+include_directories(include) #procura os ficheiros .h auto
+
+set(SOURCE_FILES
+        src/main.cpp
+        src/Simulator.cpp
+        src/Buffer.cpp
+        src/Map.cpp
+        src/Caravan.cpp
+)
+
+add_executable(Project_POO ${SOURCE_FILES})
+
+
