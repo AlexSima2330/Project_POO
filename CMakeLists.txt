@@ -11,6 +11,7 @@ set(SOURCE_FILES
         src/Buffer.cpp
         src/Map.cpp
         src/Caravan.cpp
+        include/Buffer.h
 )
 
 add_executable(Project_POO ${SOURCE_FILES})

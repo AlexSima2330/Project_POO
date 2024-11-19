@@ -5,6 +5,8 @@ cmake-build-debug/
 *.cache
 *.idea/
 *.iml
+LastTest.log
+clion-Debug-log.txt
 
 # Ignorar ficheiros gerados por CMake
 CMakeLists.txt.user
