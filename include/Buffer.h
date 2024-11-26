@@ -1,23 +1,24 @@
-//
-// Created by Alexa on 19/11/2024.
-//
+#ifndef BUFFER_H
+#define BUFFER_H
 
-#ifndef PROJECT_POO_BUFFER_H
-#define PROJECT_POO_BUFFER_H
+#include <iostream>
+#include <vector>
+#include <string>
 
-// Declaração da classe Buffer
 class Buffer {
-public:
-    // Construtor e destrutor
-    Buffer();
-    ~Buffer();
-
-    // Métodos públicos
-    void initialize();  // Exemplo de método genérico
-
 private:
-    // Atributos privados
-    int size;
+    int rows, cols;
+    std::vector<std::string> screen;
+    int cursorRow, cursorCol;
+
+public:
+    Buffer(int rows, int cols);
+    void clear();
+    void printToConsole() const;
+    void setCursor(int row, int col);
+    void putChar(char c);
+    void putString(const std::string &str);
+    friend Buffer& operator<<(Buffer &buffer, const std::string &str);
 };
 
-#endif //PROJECT_POO_BUFFER_H
+#endif

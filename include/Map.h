@@ -1,19 +1,18 @@
-//
-// Created by Alexa on 19/11/2024.
-//
+#ifndef MAP_H
+#define MAP_H
 
-#ifndef PROJECT_POO_MAP_H
-#define PROJECT_POO_MAP_H
+#include <vector>
+#include <string>
 
 class Map {
-public:
-    Map();
-    ~Map();
-
-    void move(); // Exemplo de método genérico para movimentação
-
 private:
-    int capacity;
+    int rows, cols;
+    std::vector<std::vector<char>> grid;
+
+public:
+    Map(int rows, int cols);
+    void display() const;
+    void placeCaravan(int row, int col, char symbol);
 };
 
-#endif //PROJECT_POO_MAP_H
+#endif

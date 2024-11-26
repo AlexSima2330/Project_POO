@@ -1,18 +1,21 @@
-//
-// Created by Alexa on 19/11/2024.
-//
-
 #include "Map.h"
 #include <iostream>
 
-Map::Map() {
-    capacity = 0; // Inicialização básica
+Map::Map(int rows, int cols) : rows(rows), cols(cols) {
+    grid.resize(rows, std::vector<char>(cols, '.'));
 }
 
-Map::~Map() {
-    // Código de limpeza, se necessário
+void Map::display() const {
+    for (const auto &row : grid) {
+        for (char cell : row) {
+            std::cout << cell << ' ';
+        }
+        std::cout << std::endl;
+    }
 }
 
-void Map::move() {
-    std::cout << "Caravan is moving!" << std::endl;
+void Map::placeCaravan(int row, int col, char symbol) {
+    if (row >= 0 && row < rows && col >= 0 && col < cols) {
+        grid[row][col] = symbol;
+    }
 }
