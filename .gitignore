@@ -4,7 +4,12 @@ cmake-build-debug/
 *.log
 *.cache
 *.idea/
+*.ninja
+*.cmake
+*.exe
+cache-v2*
 *.iml
+*.yaml
 LastTest.log
 clion-Debug-log.txt
 
