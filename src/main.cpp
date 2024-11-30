@@ -1,15 +1,33 @@
 #include "Simulator.h"
 #include "Caravan.h"
 
-
 int main() {
     Simulator simulator(10, 10, 10, 40);
 
-    Caravan *trade = new TradeCaravan(1);
-    Caravan *military = new MilitaryCaravan(2);
+    // Carregar o mapa
+    if (!simulator.loadMap("C:/Users/Alexa/OneDrive/Documentos/Project_POO/config/map_config.txt")) {
+        std::cerr << "Erro ao carregar o mapa. A sair..." << std::endl;
+        return 1;
+    }
 
-    simulator.addCaravan(trade, 2, 2);
-    simulator.addCaravan(military, 3, 4);
+    // Adicionar caravanas
+    Caravan* trade = new TradeCaravan(1);
+    trade->setPosition(2, 5);
+    simulator.addCaravan(trade, 2, 5);
+
+    Caravan* military = new MilitaryCaravan(2);
+    military->setPosition(7, 8);
+    simulator.addCaravan(military, 7, 8);
+
+    // Mostrar status inicial
+    simulator.showCaravanStatus();
+
+    // Mover caravanas
+    simulator.moveCaravan(1, 'B'); // Move a caravana de comércio para baixo
+    simulator.moveCaravan(2, 'D'); // Move a caravana militar para a direita
+
+    // Mostrar status após movimento
+    simulator.showCaravanStatus();
 
     simulator.run();
 
