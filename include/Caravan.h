@@ -35,6 +35,8 @@ public:
 
     // Destrutor virtual
     virtual ~Caravan() = default;
+
+    void addResource(); // Método para coletar recursos
 };
 
 // Classe TradeCaravan (Caravana de Comércio)

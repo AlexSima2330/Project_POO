@@ -45,6 +45,16 @@ void TradeCaravan::status() const {
               << ", Agua: " << water << "/" << maxWater << std::endl;
 }
 
+void Caravan::addResource() {
+    if (cargo < maxCargo) {
+        ++cargo; // Incrementa a carga
+        std::cout << "Caravana " << id << " coletou 1 recurso. Carga atual: " << cargo << "/" << maxCargo << std::endl;
+    } else {
+        std::cout << "Caravana " << id << " está com a carga máxima!" << std::endl;
+    }
+}
+
+
 // Construtor da classe MilitaryCaravan
 MilitaryCaravan::MilitaryCaravan(int id) : Caravan(id, "Military", 5, 400) {}
 

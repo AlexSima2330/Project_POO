@@ -96,19 +96,33 @@ bool Simulator::moveCaravan(int caravanId, char direction) {
             int newCol = caravan->getCol();
 
             if (newRow >= 0 && newRow < map.getRows() &&
-                newCol >= 0 && newCol < map.getCols() &&
-                map.getCell(newRow, newCol) == '.') {
+                newCol >= 0 && newCol < map.getCols()) {
 
-                map.setCell(oldRow, oldCol, '.'); // Limpa a posição antiga
-                map.setCell(newRow, newCol, 'C'); // Atualiza nova posição
-                return true;
-            } else {
-                caravan->setPosition(oldRow, oldCol); // Reverte movimento
-                std::cout << "Movimento invalido para a caravana " << caravanId << "." << std::endl;
-                return false;
-            }
+                // Verifica se a célula de destino contém um recurso
+                if (map.getCell(newRow, newCol) == 'a') {
+                    std::cout << "Caravana " << caravanId << " coletou um recurso na posicao (" << newRow << ", " << newCol << ")." << std::endl;
+                    caravan->addResource(); // Coleta o recurso
+                    map.setCell(newRow, newCol, '.'); // Remove o recurso do mapa
+                }
+
+                // Verifica se a célula está livre para movimentação
+                if (map.getCell(newRow, newCol) == '.') {
+                    map.setCell(oldRow, oldCol, '.'); // Limpa a posição antiga
+                    map.setCell(newRow, newCol, 'C'); // Atualiza nova posição
+                    return true;
+                } else {
+                    caravan->setPosition(oldRow, oldCol); // Reverte movimento
+                    std::cout << "Movimento inválido para a caravana " << caravanId << "." << std::endl;
+                    return false;
+                }
+                } else {
+                    caravan->setPosition(oldRow, oldCol); // Reverte movimento
+                    std::cout << "Movimento fora dos limites para a caravana " << caravanId << "." << std::endl;
+                    return false;
+                }
         }
     }
     std::cout << "Caravana com ID " << caravanId << " não encontrada." << std::endl;
     return false;
 }
+
