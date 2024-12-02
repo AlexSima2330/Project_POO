@@ -5,23 +5,18 @@
 // Construtor
 Simulator::Simulator(int mapRows, int mapCols, int bufferRows, int bufferCols)
     : map(mapRows, mapCols), bufferRows(bufferRows), bufferCols(bufferCols) {
-    std::cout << "Simulator inicializado com mapa de tamanho " << mapRows << "x" << mapCols << std::endl;
+    std::cout << "Mapa criado com tamanho " << mapRows << "x" << mapCols << "." << std::endl;
 }
 
 // Adicionar caravana ao mapa
 void Simulator::addCaravan(Caravan* caravan, int row, int col) {
-    try {
-        std::cout << "Tentando adicionar caravana na posicao (" << row << ", " << col << ")..." << std::endl;
-
-        if (map.getCell(row, col) == '.') { // Verifica se a posição está livre
-            caravans.push_back(caravan);  // Adiciona a caravana à lista
-            map.setCell(row, col, 'C');   // Marca a posição no mapa
-            std::cout << "Caravana adicionada na posicao (" << row << ", " << col << ")." << std::endl;
-        } else {
-            std::cerr << "Erro: A posicao (" << row << ", " << col << ") esta ocupada ou e invalida." << std::endl;
-        }
-    } catch (const std::exception& e) {
-        std::cerr << "Erro ao adicionar caravana: " << e.what() << std::endl;
+    if (map.getCell(row, col) == '.') {
+        caravans.push_back(caravan);
+        map.setCell(row, col, 'C');
+        // Mensagem simplificada
+        std::cout << "Caravana " << caravan->getId() << " adicionada na posicao (" << row << ", " << col << ")." << std::endl;
+    } else {
+        std::cerr << "Erro: Posicao (" << row << ", " << col << ") ocupada ou invalida." << std::endl;
     }
 }
 
@@ -41,11 +36,11 @@ void Simulator::run() {
     std::cout << "Iniciando a simulacao..." << std::endl;
 
     while (true) {
-        displayMap(); // Exibe o mapa
+        displayMap(); // Mostra o mapa
 
-        // Adiciona lógica de interação (ex.: comandos do utilizador)
+        // Leitura de comandos
         std::string command;
-        std::cout << "Digite um comando (sair, status, move <id> <direcao>): ";
+        std::cout << "Digite um comando (sair, status, move <id> <direcao>, auto <id>): ";
         std::getline(std::cin, command);
 
         if (command == "sair") {
@@ -54,25 +49,27 @@ void Simulator::run() {
         } else if (command == "status") {
             showCaravanStatus();
         } else if (command.find("move") == 0) {
-            // Exemplo de comando: "move 1 D"
             int caravanId;
             char direction;
             std::istringstream iss(command);
             iss >> command >> caravanId >> direction;
 
             if (!moveCaravan(caravanId, direction)) {
-                std::cout << "Falha ao mover a caravana." << std::endl;
+                std::cout << "Movimento invalido." << std::endl;
             }
+        } else if (command.find("auto") == 0) {
+            // Ativa comportamento automático (a implementar)
         } else {
-            std::cout << "Comando invalido!" << std::endl;
+            std::cout << "Comando invalido." << std::endl;
         }
     }
 }
 
+
 // Exibir o estado atual do mapa
 void Simulator::displayMap() {
     std::cout << "Mapa Atual:" << std::endl;
-    map.display();
+    map.display(); // Mostra apenas o mapa
 }
 
 // Mostrar o estado das caravanas
@@ -87,42 +84,71 @@ void Simulator::showCaravanStatus() const {
 bool Simulator::moveCaravan(int caravanId, char direction) {
     for (auto caravan : caravans) {
         if (caravan->getId() == caravanId) {
+            if (!caravan->isActive()) {
+                std::cout << "Caravana " << caravanId << " esta inativa. Não pode mover-se." << std::endl;
+                return false;
+            }
+
+            const int waterConsumptionPerMove = 10;
+            if (caravan->getWater() < waterConsumptionPerMove) {
+                caravan->loseCrew(1);
+                std::cout << "Caravana " << caravanId << " perdeu 1 tripulante por falta de agua. Tripulantes restantes: "
+                          << caravan->getCrew() << std::endl;
+                return false;
+            }
+
             int oldRow = caravan->getRow();
             int oldCol = caravan->getCol();
+            int oldCellKey = oldRow * map.getCols() + oldCol; // Gera uma chave única para a célula
+            char oldCellContent = map.getCell(oldRow, oldCol); // Conteúdo original da célula antiga
 
+            caravan->consumeWater(waterConsumptionPerMove);
             caravan->move(direction);
 
             int newRow = caravan->getRow();
             int newCol = caravan->getCol();
+            int newCellKey = newRow * map.getCols() + newCol; // Gera uma chave única para a nova célula
 
             if (newRow >= 0 && newRow < map.getRows() &&
                 newCol >= 0 && newCol < map.getCols()) {
 
-                // Verifica se a célula de destino contém um recurso
-                if (map.getCell(newRow, newCol) == 'a') {
-                    std::cout << "Caravana " << caravanId << " coletou um recurso na posicao (" << newRow << ", " << newCol << ")." << std::endl;
-                    caravan->addResource(); // Coleta o recurso
-                    map.setCell(newRow, newCol, '.'); // Remove o recurso do mapa
+                // Se a célula contém um carregador, reabastece
+                if (map.getCell(newRow, newCol) == 'c') {
+                    caravan->refillWater();
+                    std::cout << "Caravana " << caravanId << " reabasteceu agua no carregador em (" << newRow << ", " << newCol << ")."
+                              << std::endl;
                 }
 
-                // Verifica se a célula está livre para movimentação
-                if (map.getCell(newRow, newCol) == '.') {
-                    map.setCell(oldRow, oldCol, '.'); // Limpa a posição antiga
-                    map.setCell(newRow, newCol, 'C'); // Atualiza nova posição
+                // Move a caravana e restaura o estado do mapa
+                if (map.getCell(newRow, newCol) == '.' || map.getCell(newRow, newCol) == 'c') {
+                    // Restaura o conteúdo original da célula antiga
+                    if (originalCellContent.count(oldCellKey)) {
+                        map.setCell(oldRow, oldCol, originalCellContent[oldCellKey]);
+                        originalCellContent.erase(oldCellKey);
+                    } else {
+                        map.setCell(oldRow, oldCol, '.');
+                    }
+
+                    // Guarda o estado original da nova célula se ainda não estiver salvo
+                    if (map.getCell(newRow, newCol) == 'c') {
+                        originalCellContent[newCellKey] = 'c';
+                    }
+
+                    // Atualiza a nova célula com a caravana
+                    map.setCell(newRow, newCol, 'C');
                     return true;
                 } else {
                     caravan->setPosition(oldRow, oldCol); // Reverte movimento
-                    std::cout << "Movimento inválido para a caravana " << caravanId << "." << std::endl;
+                    std::cout << "Movimento invalido para a caravana " << caravanId << "." << std::endl;
                     return false;
                 }
-                } else {
-                    caravan->setPosition(oldRow, oldCol); // Reverte movimento
-                    std::cout << "Movimento fora dos limites para a caravana " << caravanId << "." << std::endl;
-                    return false;
-                }
+            } else {
+                caravan->setPosition(oldRow, oldCol); // Reverte movimento
+                std::cout << "Movimento fora dos limites para a caravana " << caravanId << "." << std::endl;
+                return false;
+            }
         }
     }
     std::cout << "Caravana com ID " << caravanId << " não encontrada." << std::endl;
     return false;
 }
-

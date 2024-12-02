@@ -1,6 +1,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
+#include <unordered_map>
 #include "Map.h"
 #include "Caravan.h"
 #include <vector>
@@ -28,6 +29,9 @@ public:
     bool moveCaravan(int caravanId, char direction);
 
     void showCaravanStatus() const;
+
+    // Map para armazenar o estado original de células ocupadas pelas caravanas
+    std::unordered_map<int, char> originalCellContent;
 
 };
 

@@ -36,7 +36,46 @@ public:
     // Destrutor virtual
     virtual ~Caravan() = default;
 
-    void addResource(); // Método para coletar recursos
+    void addResource(); // Coletar recursos
+
+    int getWater() const { return water; }
+
+    void consumeWater(int amount) {
+        if (amount > 0 && water >= amount) {
+            water -= amount;
+        }
+    }
+
+    void setWater(int amount) {
+        if (amount >= 0 && amount <= maxWater) {
+            water = amount;
+        }
+    }
+
+    //reabaste se agua em c (carrgeador)
+    void refillWater() {
+        water = maxWater;
+    }
+
+    // Verifica se a caravana ainda está ativa (tem tripulantes)
+    bool isActive() const {
+        return crew > 0;
+    }
+
+    // Reduz o número de tripulantes
+    void loseCrew(int amount) {
+        if (crew > 0) {
+            crew -= amount;
+            if (crew < 0) crew = 0; // Evita números negativos
+        }
+    }
+
+    // Retorna o número de tripulantes restantes
+    int getCrew() const {
+        return crew;
+    }
+
+
 };
 
 // Classe TradeCaravan (Caravana de Comércio)

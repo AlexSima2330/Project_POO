@@ -11,13 +11,37 @@ void Caravan::setPosition(int newRow, int newCol) {
     col = newCol;
 }
 
-// Movimento básico
+// Movimento consoante a agua
 void Caravan::move(char direction) {
-    if (direction == 'C') --row;        // Cima
-    else if (direction == 'B') ++row;  // Baixo
-    else if (direction == 'D') ++col;  // Direita
-    else if (direction == 'E') --col;  // Esquerda
+    // Consome água antes de mover
+    const int waterConsumptionPerMove = 10; // Define o consumo padrão
+    if (water >= waterConsumptionPerMove) {
+        water -= waterConsumptionPerMove; // Reduz a água
+    } else {
+        std::cout << "Caravana " << id << " sem agua suficiente para mover!" << std::endl;
+        return;
+    }
+
+    // Atualiza a posição conforme a direção
+    switch (direction) {
+        case 'B': // Baixo
+            ++row;
+        break;
+        case 'C': // Cima
+            --row;
+        break;
+        case 'E': // Esquerda
+            --col;
+        break;
+        case 'D': // Direita
+            ++col;
+        break;
+        default:
+            std::cout << "Direcao invalida!" << std::endl;
+        break;
+    }
 }
+
 
 // Exibe o status básico
 void Caravan::status() const {
@@ -50,7 +74,7 @@ void Caravan::addResource() {
         ++cargo; // Incrementa a carga
         std::cout << "Caravana " << id << " coletou 1 recurso. Carga atual: " << cargo << "/" << maxCargo << std::endl;
     } else {
-        std::cout << "Caravana " << id << " está com a carga máxima!" << std::endl;
+        std::cout << "Caravana " << id << " está com a carga maxima!" << std::endl;
     }
 }
 

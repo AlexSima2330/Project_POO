@@ -14,20 +14,23 @@ int main() {
     Caravan* trade = new TradeCaravan(1);
     trade->setPosition(2, 5);
     simulator.addCaravan(trade, 2, 5);
+    trade->setWater(50);    // Define 50 unidades de água para a caravana de comércio// Define 30 unidades de água para a caravana militar
+
 
     Caravan* military = new MilitaryCaravan(2);
-    military->setPosition(7, 8);
-    simulator.addCaravan(military, 7, 8);
+    military->setPosition(7, 4);
+    simulator.addCaravan(military, 7, 4);
+    military->setWater(400);
 
     // Mostrar status inicial
-    simulator.showCaravanStatus();
+    //simulator.showCaravanStatus();
 
-    // Mover caravanas
-    simulator.moveCaravan(1, 'B'); // Move a caravana de comércio para baixo
-    simulator.moveCaravan(2, 'D'); // Move a caravana militar para a direita
+    // Mover caravanas ao iniciar
+    //simulator.moveCaravan(1, 'B'); // Move a caravana de comércio para baixo
+    //simulator.moveCaravan(2, 'D'); // Move a caravana militar para a direita
 
     // Mostrar status após movimento
-    simulator.showCaravanStatus();
+    //simulator.showCaravanStatus();
 
     simulator.run();
 
