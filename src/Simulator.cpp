@@ -55,7 +55,7 @@ void Simulator::run() {
             iss >> command >> caravanId >> direction;
 
             if (!moveCaravan(caravanId, direction)) {
-                std::cout << "Movimento invalido." << std::endl;
+                //std::cout << "Movimento invalido." << std::endl;
             }
         } else if (command.find("auto") == 0) {
             // Ativa comportamento automático (a implementar)
@@ -92,8 +92,8 @@ bool Simulator::moveCaravan(int caravanId, char direction) {
             const int waterConsumptionPerMove = 10;
             if (caravan->getWater() < waterConsumptionPerMove) {
                 caravan->loseCrew(1);
-                std::cout << "Caravana " << caravanId << " perdeu 1 tripulante por falta de agua. Tripulantes restantes: "
-                          << caravan->getCrew() << std::endl;
+                std::cout << "Caravana " << caravanId << " perdeu 1 tripulante por falta de agua." << std::endl
+                << "Tripulantes restantes: " << caravan->getCrew() << std::endl;
                 return false;
             }
 
@@ -149,6 +149,6 @@ bool Simulator::moveCaravan(int caravanId, char direction) {
             }
         }
     }
-    std::cout << "Caravana com ID " << caravanId << " não encontrada." << std::endl;
+    std::cout << "Caravana com ID " << caravanId << " nao encontrada." << std::endl;
     return false;
 }
