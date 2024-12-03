@@ -5,6 +5,8 @@
 #include <iostream>
 #include "Map.h" // Inclui para manipular o mapa diretamente
 
+class Map;
+
 // Classe base para Caravanas
 class Caravan {
 protected:
@@ -18,6 +20,7 @@ protected:
     int col;             // Coluna (posição atual no mapa)
     std::string type;    // Tipo da caravana (ex.: Comércio, Militar)
     bool onCharger = false;
+    bool inCity = false;
 
 public:
     // Construtor
@@ -90,6 +93,9 @@ public:
     void setOnCharger(bool value) {
         onCharger = value;
     }
+
+    bool isInCity() const { return inCity; }
+    void setInCity(bool value) { inCity = value; }
 
 };
 

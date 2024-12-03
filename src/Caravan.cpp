@@ -1,4 +1,5 @@
 #include "Caravan.h"
+#include "Map.h"
 #include <iostream>
 
 // Construtor da classe base Caravan
@@ -30,8 +31,8 @@ bool Caravan::processMovement(Map &map, int waterConsumption) {
         return true; // Movimento permitido
     }
 
-    loseCrew(2); // Perde tripulantes por falta de água
-    std::cout << "[Caravana] ID: " << id << " sem água suficiente. Perdeu 2 tripulantes. Tripulantes restantes: " << crew << std::endl;
+    loseCrew(10); // Perde tripulantes por falta de água
+    std::cout << "[Caravana] ID: " << id << " sem agua suficiente. Perdeu 2 tripulantes. Tripulantes restantes: " << crew << std::endl;
 
     // Se ficar inativa, transforma-se em obstáculo
     if (!isActive()) {
@@ -46,7 +47,7 @@ bool Caravan::processMovement(Map &map, int waterConsumption) {
 void Caravan::becomeObstacle(Map &map) {
     auto [wrappedRow, wrappedCol] = map.wrapCoordinates(row, col);
     map.setCell(wrappedRow, wrappedCol, '+');
-    std::cout << "[Caravana] ID: " << id << " tornou-se um obstáculo em (" << wrappedRow << ", " << wrappedCol << ")." << std::endl;
+    std::cout << "[Caravana] ID: " << id << " tornou-se um obstaculo em (" << wrappedRow << ", " << wrappedCol << ")." << std::endl;
 }
 
 // Exibe o status básico

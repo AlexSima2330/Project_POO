@@ -87,7 +87,7 @@ bool Simulator::moveCaravan(int caravanId, char direction) {
             const int waterConsumptionPerMove = 10;
 
             if (!caravan->processMovement(map, waterConsumptionPerMove)) {
-                std::cout << "Caravana " << caravanId << " ficou inativa e tornou-se um obstáculo." << std::endl;
+                std::cout << "Caravana " << caravanId << " ficou inativa e tornou-se um obstaculo." << std::endl;
                 return false;
             }
 
