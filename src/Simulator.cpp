@@ -84,71 +84,58 @@ void Simulator::showCaravanStatus() const {
 bool Simulator::moveCaravan(int caravanId, char direction) {
     for (auto caravan : caravans) {
         if (caravan->getId() == caravanId) {
-            if (!caravan->isActive()) {
-                std::cout << "Caravana " << caravanId << " esta inativa. Não pode mover-se." << std::endl;
-                return false;
-            }
-
+            // Processa o consumo de água e verifica inatividade
             const int waterConsumptionPerMove = 10;
-            if (caravan->getWater() < waterConsumptionPerMove) {
-                caravan->loseCrew(1);
-                std::cout << "Caravana " << caravanId << " perdeu 1 tripulante por falta de agua." << std::endl
-                << "Tripulantes restantes: " << caravan->getCrew() << std::endl;
+            if (!caravan->processMovement(map, waterConsumptionPerMove)) {
+                std::cout << "Caravana " << caravanId << " ficou inativa e tornou-se um obstáculo." << std::endl;
                 return false;
             }
 
+            // Coordenadas atuais
             int oldRow = caravan->getRow();
             int oldCol = caravan->getCol();
-            int oldCellKey = oldRow * map.getCols() + oldCol; // Gera uma chave única para a célula
-            char oldCellContent = map.getCell(oldRow, oldCol); // Conteúdo original da célula antiga
 
-            caravan->consumeWater(waterConsumptionPerMove);
+            // Move a caravana
             caravan->move(direction);
 
-            int newRow = caravan->getRow();
-            int newCol = caravan->getCol();
-            int newCellKey = newRow * map.getCols() + newCol; // Gera uma chave única para a nova célula
+            // Ajusta as coordenadas com comportamento circular
+            auto [newRow, newCol] = map.wrapCoordinates(caravan->getRow(), caravan->getCol());
 
-            if (newRow >= 0 && newRow < map.getRows() &&
-                newCol >= 0 && newCol < map.getCols()) {
-
-                // Se a célula contém um carregador, reabastece
-                if (map.getCell(newRow, newCol) == 'c') {
-                    caravan->refillWater();
-                    std::cout << "Caravana " << caravanId << " reabasteceu agua no carregador em (" << newRow << ", " << newCol << ")."
-                              << std::endl;
-                }
-
-                // Move a caravana e restaura o estado do mapa
-                if (map.getCell(newRow, newCol) == '.' || map.getCell(newRow, newCol) == 'c') {
-                    // Restaura o conteúdo original da célula antiga
-                    if (originalCellContent.count(oldCellKey)) {
-                        map.setCell(oldRow, oldCol, originalCellContent[oldCellKey]);
-                        originalCellContent.erase(oldCellKey);
-                    } else {
-                        map.setCell(oldRow, oldCol, '.');
-                    }
-
-                    // Guarda o estado original da nova célula se ainda não estiver salvo
-                    if (map.getCell(newRow, newCol) == 'c') {
-                        originalCellContent[newCellKey] = 'c';
-                    }
-
-                    // Atualiza a nova célula com a caravana
-                    map.setCell(newRow, newCol, 'C');
-                    return true;
-                } else {
-                    caravan->setPosition(oldRow, oldCol); // Reverte movimento
-                    std::cout << "Movimento invalido para a caravana " << caravanId << "." << std::endl;
-                    return false;
-                }
-            } else {
-                caravan->setPosition(oldRow, oldCol); // Reverte movimento
-                std::cout << "Movimento fora dos limites para a caravana " << caravanId << "." << std::endl;
+            // Verifica se a célula de destino é um obstáculo
+            char cellContent = map.getCell(newRow, newCol);
+            if (cellContent == '+' || cellContent == 'b' || cellContent == 'a') {
+                // Reverte o movimento para a posição original
+                caravan->setPosition(oldRow, oldCol);
+                std::cout << "[Caravana] ID: " << caravanId << " nao pode ultrapassar obstáculos. Movimento inválido." << std::endl;
+                std::cout << "Movimento invalido. A caravana perdeu tempo e recursos." << std::endl;
                 return false;
             }
+
+            // Atualiza o mapa
+            auto [wrappedOldRow, wrappedOldCol] = map.wrapCoordinates(oldRow, oldCol); // Coordenadas ajustadas para a célula antiga
+            map.setCell(wrappedOldRow, wrappedOldCol, '.'); // Limpa a célula antiga
+            map.setCell(newRow, newCol, 'C'); // Define a nova célula
+            caravan->setPosition(newRow, newCol); // Atualiza a posição na caravana
+
+            // Verifica se a célula contém um carregador
+            if (cellContent == 'c') {
+                caravan->refillWater();
+                std::cout << "Caravana " << caravanId << " reabasteceu agua no carregador em (" << newRow << ", " << newCol << ")." << std::endl;
+            }
+
+            // Mensagem de sucesso
+            std::cout << "Caravana " << caravanId << " moveu-se para (" << newRow << ", " << newCol << ")." << std::endl;
+            return true;
         }
     }
+
+    // Caso o ID da caravana não seja encontrado
     std::cout << "Caravana com ID " << caravanId << " nao encontrada." << std::endl;
     return false;
 }
+
+
+
+
+
+

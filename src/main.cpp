@@ -12,9 +12,9 @@ int main() {
 
     // Adicionar caravanas
     Caravan* trade = new TradeCaravan(1);
-    trade->setPosition(2, 5);
-    simulator.addCaravan(trade, 2, 5);
-    trade->setWater(100);    // Define 50 unidades de água para a caravana de comércio// Define 30 unidades de água para a caravana militar
+    trade->setPosition(2, 6);
+    simulator.addCaravan(trade, 2, 6);
+    trade->setWater(10);    // Define 50 unidades de água para a caravana de comércio// Define 30 unidades de água para a caravana militar
 
 
     Caravan* military = new MilitaryCaravan(2);

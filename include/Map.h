@@ -14,6 +14,9 @@ private:
 public:
     Map(int rows, int cols);
 
+    // Método para ajustar coordenadas para o comportamento circular
+    std::pair<int, int> wrapCoordinates(int row, int col) const;
+
     // Função para carregar o mapa de um ficheiro
     bool loadFromFile(const std::string& filename);
 

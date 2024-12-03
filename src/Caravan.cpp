@@ -11,37 +11,43 @@ void Caravan::setPosition(int newRow, int newCol) {
     col = newCol;
 }
 
-// Movimento consoante a agua
+// Movimento baseado na direção
 void Caravan::move(char direction) {
-    // Consome água antes de mover
-    const int waterConsumptionPerMove = 10; // Define o consumo padrão
-    if (water >= waterConsumptionPerMove) {
-        water -= waterConsumptionPerMove; // Reduz a água
-    } else {
-        std::cout << "Caravana " << id << " sem agua suficiente para mover!" << std::endl;
-        return;
-    }
-
-    // Atualiza a posição conforme a direção
     switch (direction) {
-        case 'B': // Baixo
-            ++row;
-        break;
-        case 'C': // Cima
-            --row;
-        break;
-        case 'E': // Esquerda
-            --col;
-        break;
-        case 'D': // Direita
-            ++col;
-        break;
+        case 'B': ++row; break;
+        case 'C': --row; break;
+        case 'E': --col; break;
+        case 'D': ++col; break;
         default:
-            std::cout << "Direcao invalida!" << std::endl;
-        break;
+            std::cout << "Direção inválida!" << std::endl;
     }
 }
 
+// Processa consumo de água e inatividade
+bool Caravan::processMovement(Map &map, int waterConsumption) {
+    if (water >= waterConsumption) {
+        water -= waterConsumption;
+        return true; // Movimento permitido
+    }
+
+    loseCrew(2); // Perde tripulantes por falta de água
+    std::cout << "[Caravana] ID: " << id << " sem água suficiente. Perdeu 2 tripulantes. Tripulantes restantes: " << crew << std::endl;
+
+    // Se ficar inativa, transforma-se em obstáculo
+    if (!isActive()) {
+        becomeObstacle(map);
+        return false;
+    }
+
+    return true; // Continua a tentar mover
+}
+
+// Transforma a caravana em obstáculo
+void Caravan::becomeObstacle(Map &map) {
+    auto [wrappedRow, wrappedCol] = map.wrapCoordinates(row, col);
+    map.setCell(wrappedRow, wrappedCol, '+');
+    std::cout << "[Caravana] ID: " << id << " tornou-se um obstáculo em (" << wrappedRow << ", " << wrappedCol << ")." << std::endl;
+}
 
 // Exibe o status básico
 void Caravan::status() const {
@@ -68,16 +74,6 @@ void TradeCaravan::status() const {
               << ", Carga: " << cargo << "/" << maxCargo
               << ", Agua: " << water << "/" << maxWater << std::endl;
 }
-
-void Caravan::addResource() {
-    if (cargo < maxCargo) {
-        ++cargo; // Incrementa a carga
-        std::cout << "Caravana " << id << " coletou 1 recurso. Carga atual: " << cargo << "/" << maxCargo << std::endl;
-    } else {
-        std::cout << "Caravana " << id << " está com a carga maxima!" << std::endl;
-    }
-}
-
 
 // Construtor da classe MilitaryCaravan
 MilitaryCaravan::MilitaryCaravan(int id) : Caravan(id, "Military", 5, 400) {}

@@ -5,6 +5,30 @@
 // Construtor: inicializa o mapa com '.' (espaço vazio)
 Map::Map(int rows, int cols) : rows(rows), cols(cols), grid(rows, std::vector<char>(cols, '.')) {}
 
+// Método para coordenadas espiral
+std::pair<int, int> Map::wrapCoordinates(int row, int col) const {
+    if (col >= cols) {
+        // Saiu pela direita, move para a próxima linha, coluna inicial
+        row = (row + 1) % rows;
+        col = 0;
+    } else if (col < 0) {
+        // Saiu pela esquerda, move para a linha anterior, última coluna
+        row = (row - 1 + rows) % rows;
+        col = cols - 1;
+    }
+
+    if (row >= rows) {
+        // Saiu pela última linha (indo para baixo), volta à primeira
+        row = 0;
+    } else if (row < 0) {
+        // Saiu pela primeira linha (indo para cima), volta à última
+        row = rows - 1;
+    }
+
+    return {row, col};
+}
+
+
 // Função para carregar o mapa de um ficheiro
 bool Map::loadFromFile(const std::string& filename) {
     std::ifstream file(filename);
@@ -38,19 +62,14 @@ void Map::display() const {
     }
 }
 
-// Getter para obter o conteúdo de uma célula
+// Getter para obter o conteúdo de uma célula (usando coordenadas circulares)
 char Map::getCell(int row, int col) const {
-    if (row >= 0 && row < rows && col >= 0 && col < cols) {
-        return grid[row][col];
-    }
-    throw std::out_of_range("Coordenadas fora dos limites do mapa.");
+    auto [wrappedRow, wrappedCol] = wrapCoordinates(row, col);
+    return grid[wrappedRow][wrappedCol];
 }
 
-// Setter para modificar o conteúdo de uma célula
+// Setter para modificar o conteúdo de uma célula (usando coordenadas circulares)
 void Map::setCell(int row, int col, char value) {
-    if (row >= 0 && row < rows && col >= 0 && col < cols) {
-        grid[row][col] = value;
-    } else {
-        throw std::out_of_range("Coordenadas fora dos limites do mapa.");
-    }
+    auto [wrappedRow, wrappedCol] = wrapCoordinates(row, col);
+    grid[wrappedRow][wrappedCol] = value;
 }

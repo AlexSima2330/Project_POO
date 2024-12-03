@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include "Map.h" // Inclui para manipular o mapa diretamente
 
 // Classe base para Caravanas
 class Caravan {
@@ -33,6 +34,12 @@ public:
     // Status
     virtual void status() const; // Exibir o estado da caravana
 
+    // Processamento do movimento e penalidades
+    bool processMovement(Map &map, int waterConsumption);
+
+    // Converte a caravana para um obstáculo no mapa
+    void becomeObstacle(Map &map);
+
     // Destrutor virtual
     virtual ~Caravan() = default;
 
@@ -52,7 +59,7 @@ public:
         }
     }
 
-    //reabaste se agua em c (carrgeador)
+    // Reabastecer água em carregador
     void refillWater() {
         water = maxWater;
     }
