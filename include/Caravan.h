@@ -17,6 +17,7 @@ protected:
     int row;             // Linha (posição atual no mapa)
     int col;             // Coluna (posição atual no mapa)
     std::string type;    // Tipo da caravana (ex.: Comércio, Militar)
+    bool onCharger = false;
 
 public:
     // Construtor
@@ -82,6 +83,13 @@ public:
         return crew;
     }
 
+    bool wasOnCharger() const {
+        return onCharger;
+    }
+
+    void setOnCharger(bool value) {
+        onCharger = value;
+    }
 
 };
 
