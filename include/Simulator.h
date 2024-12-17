@@ -5,15 +5,20 @@
 #include "Map.h"
 #include "Caravan.h"
 #include <vector>
+#include "Buffer.h"
+#include "Wallet.h"
 
 class Simulator {
 private:
     Map map; // Objeto do tipo Map
     std::vector<Caravan*> caravans; // Lista de caravanas
     int bufferRows, bufferCols; // Tamanho do buffer
+    int mapRows, mapCols;
+    Buffer buffer;
+    Wallet wallet;
 
 public:
-    Simulator(int mapRows, int mapCols, int bufferRows, int bufferCols);
+    Simulator();
 
     // Adiciona uma caravana no mapa
     void addCaravan(Caravan* caravan, int row, int col);

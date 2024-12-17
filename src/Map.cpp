@@ -31,7 +31,6 @@ pair<int, int> Map::wrapCoordinates(int row, int col) const {
     return {row, col};
 }
 
-
 // Função para carregar o mapa de um ficheiro
 bool Map::loadFromFile(const string& filename) {
     ifstream file(filename);
@@ -40,16 +39,17 @@ bool Map::loadFromFile(const string& filename) {
         return false;
     }
 
-    // Lê as dimensões
-    file >> rows >> cols;
-    grid.resize(rows, vector<char>(cols, '.')); // Ajusta o tamanho do mapa
+    // Mantém as dimensões iniciais do mapa
+    grid.assign(rows, vector<char>(cols, '.')); // Reseta o mapa com as dimensões especificadas
 
-    // Lê o conteúdo do mapa
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            file >> grid[i][j];
-            if (std::islower(grid[i][j])) {  // Identifica cidades (letras minúsculas)
-                addCity(grid[i][j], i, j);
+    // Lê o conteúdo do mapa do arquivo, limitando às dimensões definidas
+    for (int i = 0; i < rows && !file.eof(); ++i) {
+        for (int j = 0; j < cols && !file.eof(); ++j) {
+            char cell;
+            file >> cell;
+            grid[i][j] = cell;
+            if (std::islower(cell)) {  // Identifica cidades (letras minúsculas)
+                addCity(cell, i, j);
             }
         }
     }
@@ -57,7 +57,6 @@ bool Map::loadFromFile(const string& filename) {
     file.close();
     return true;
 }
-
 
 // Função para exibir o mapa
 void Map::display() const {
@@ -80,6 +79,7 @@ void Map::addCity(char name, int row, int col) {
     cities.emplace_back(name);
     grid[row][col] = name;  // Marca a posição da cidade no mapa com o seu nome
 }
+
 City* Map::getCityByName(char name) {
     for (auto& city : cities) {
         if (city.getName() == name) {
@@ -88,6 +88,7 @@ City* Map::getCityByName(char name) {
     }
     return nullptr;  // Cidade não encontrada
 }
+
 City* Map::getCityAt(int row, int col) {
     char cell = getCell(row, col);
     if (std::islower(cell)) {  // Letras minúsculas representam cidades
@@ -95,13 +96,11 @@ City* Map::getCityAt(int row, int col) {
     }
     return nullptr;  // Não é uma cidade
 }
+
 bool Map::isCity(int row, int col) const {
     char cell = getCell(row, col);
     return std::islower(cell);  // Letras minúsculas representam cidades
 }
-
-
-
 
 // Getter para obter o conteúdo de uma célula (usando coordenadas circulares)
 char Map::getCell(int row, int col) const {

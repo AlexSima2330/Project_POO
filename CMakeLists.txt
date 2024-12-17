@@ -14,6 +14,8 @@ set(SOURCE_FILES
         include/Buffer.h
         include/city.h
         src/city.cpp
+        include/Wallet.h
+        src/Wallet.cpp
 )
 
 add_executable(Project_POO ${SOURCE_FILES})

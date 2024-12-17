@@ -1,11 +1,15 @@
 #include "Simulator.h"
 #include <iostream>
 #include <sstream>
+#include <fstream>
+#include <Wallet.h>
+#include <Map.h>
+#include <Caravan.h>
+using namespace std;
 
 // Construtor
-Simulator::Simulator(int mapRows, int mapCols, int bufferRows, int bufferCols)
-    : map(mapRows, mapCols), bufferRows(bufferRows), bufferCols(bufferCols) {
-    std::cout << "Mapa criado com tamanho " << mapRows << "x" << mapCols << "." << std::endl;
+Simulator::Simulator() : map(0, 0), bufferRows(0), bufferCols(0), buffer(0, 0), wallet(0) {
+    cout << "Mapa criado com sucesso!" << endl;
 }
 
 // Adicionar caravana ao mapa
@@ -13,68 +17,107 @@ void Simulator::addCaravan(Caravan* caravan, int row, int col) {
     if (map.getCell(row, col) == '.') {
         caravans.push_back(caravan);
         map.setCell(row, col, 'C');
-        // Mensagem simplificada
-        std::cout << "Caravana " << caravan->getId() << " adicionada na posicao (" << row << ", " << col << ")." << std::endl;
     } else {
-        std::cerr << "Erro: Posicao (" << row << ", " << col << ") ocupada ou invalida." << std::endl;
+        cerr << "Erro: Posicao (" << row << ", " << col << ") ocupada ou invalida para a Caravana." << endl;
     }
 }
 
-// Carregar mapa a partir de ficheiro
+// Carregar mapa a partir do ficheiro
 bool Simulator::loadMap(const std::string& filename) {
-    if (map.loadFromFile(filename)) {
-        std::cout << "Mapa carregado com sucesso do ficheiro: " << filename << std::endl;
-        return true;
-    } else {
-        std::cerr << "Erro ao carregar o mapa do ficheiro: " << filename << std::endl;
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Erro ao abrir o ficheiro: " << filename << endl << "A sair..." << endl;
         return false;
     }
+
+    int rowsConfig, colsConfig, initialCoins;
+    file >> rowsConfig >> colsConfig >> initialCoins;
+
+    mapRows = rowsConfig;
+    mapCols = colsConfig;
+
+    map = Map(rowsConfig, colsConfig);
+    wallet = Wallet(initialCoins);
+    bufferRows = 10;
+    bufferCols = 20;
+    buffer = Buffer(bufferRows, bufferCols);
+
+    for (int i = 0; i < rowsConfig; ++i) {
+        for (int j = 0; j < colsConfig; ++j) {
+            char cell;
+            file >> cell;
+            map.setCell(i, j, cell);
+            if (islower(cell)) {
+                map.addCity(cell, i, j);
+            }
+        }
+    }
+
+    file.close();
+    return true;
 }
+
+
 
 // Executar a lógica principal do simulador
 void Simulator::run() {
-    std::cout << "Iniciando a simulacao..." << std::endl;
-
     while (true) {
         displayMap(); // Mostra o mapa
 
         // Leitura de comandos
-        std::string command;
-        std::cout << "Digite um comando (sair, status, move <id> <direcao>, auto <id>): ";
-        std::getline(std::cin, command);
+        string command;
+        cout << "Digite um comando (sair, status, move <id> <direcao>, auto <id>): ";
+        getline(cin, command);
 
         if (command == "sair") {
-            std::cout << "Simulacao terminada." << std::endl;
+            cout << "Simulacao terminada." << endl;
             break;
         } else if (command == "status") {
             showCaravanStatus();
         } else if (command.find("move") == 0) {
             int caravanId;
             char direction;
-            std::istringstream iss(command);
+            istringstream iss(command);
             iss >> command >> caravanId >> direction;
 
             if (!moveCaravan(caravanId, direction)) {
-                //std::cout << "Movimento invalido." << std::endl;
+                cout << "Movimento invalido." << endl;
             }
         } else if (command.find("auto") == 0) {
             // Ativa comportamento automático (a implementar)
         } else {
-            std::cout << "Comando invalido." << std::endl;
+            cout << "Comando invalido." << endl;
         }
     }
 }
 
-
 // Exibir o estado atual do mapa
 void Simulator::displayMap() {
-    std::cout << "Mapa Atual:" << std::endl;
-    map.display(); // Mostra apenas o mapa
+    buffer.clear();
+
+    cout << "Colunas = " << mapCols << endl;
+    cout << "Linhas  = " << mapRows << endl;
+
+    // Calcular o ponto inicial para desenhar o mapa no buffer
+    int startRow = (bufferRows > map.getRows()) ? (bufferRows - map.getRows()) / 2 : 0;
+    int startCol = (bufferCols > map.getCols()) ? (bufferCols - map.getCols()) / 2 : 0;
+
+    // Iterar sobre o mapa e desenhá-lo no buffer
+    for (int i = 0; i < map.getRows(); ++i) {
+        for (int j = 0; j < map.getCols(); ++j) {
+            buffer.setCursor(startRow + i, startCol + j);
+            buffer.putChar(map.getCell(i, j));
+        }
+    }
+
+    buffer.printToConsole(); // Desenha o buffer no terminal
+    // Depois de buffer.printToConsole();
+    cout << "Moedas iniciais: " << wallet.getCoins() << std::endl;
 }
 
 // Mostrar o estado das caravanas
 void Simulator::showCaravanStatus() const {
-    std::cout << "Estado das Caravanas:" << std::endl;
+    cout << "Estado das Caravanas:" << endl;
     for (auto caravan : caravans) {
         caravan->status();
     }
@@ -87,56 +130,45 @@ bool Simulator::moveCaravan(int caravanId, char direction) {
             const int waterConsumptionPerMove = 10;
 
             if (!caravan->processMovement(map, waterConsumptionPerMove)) {
-                std::cout << "Caravana " << caravanId << " ficou inativa e tornou-se um obstaculo." << std::endl;
+                buffer << "Caravana " << caravanId << " ficou inativa e tornou-se um obstáculo.\n";
                 return false;
             }
 
-            // Coordenadas atuais
             int oldRow = caravan->getRow();
             int oldCol = caravan->getCol();
 
-            // Move a caravana
             caravan->move(direction);
-
-            // Ajusta as coordenadas com comportamento espiral
             auto [newRow, newCol] = map.wrapCoordinates(caravan->getRow(), caravan->getCol());
 
-            // Verifica se a célula de destino é um obstáculo
             char cellContent = map.getCell(newRow, newCol);
             if (cellContent == '+' || cellContent == 'b' || cellContent == 'a') {
                 caravan->setPosition(oldRow, oldCol);
-                std::cout << "[Caravana] ID: " << caravanId << " nao pode ultrapassar obstaculos. Movimento invalido." << std::endl;
+                buffer << "[Caravana] ID: " << caravanId << " nao pode ultrapassar obstaculos. Movimento invalido.\n";
                 return false;
             }
 
-            // Atualiza o mapa para a célula antiga
             auto [wrappedOldRow, wrappedOldCol] = map.wrapCoordinates(oldRow, oldCol);
-
-            // Restaura o estado da célula antiga antes de mover
             if (map.getCell(wrappedOldRow, wrappedOldCol) == 'C') {
                 map.setCell(wrappedOldRow, wrappedOldCol, caravan->wasOnCharger() ? 'c' : '.');
             }
 
-            // Verifica se a nova célula contém um carregador
             if (cellContent == 'c') {
                 caravan->refillWater();
-                caravan->setOnCharger(true); // Marcar que estava num carregador
-                std::cout << "Caravana " << caravanId << " reabasteceu agua no carregador em ("
-                          << newRow << ", " << newCol << ")." << std::endl;
+                caravan->setOnCharger(true);
+                buffer << "Caravana " << caravanId << " reabasteceu agua no carregador em ("
+                       << newRow << ", " << newCol << ").\n";
             } else {
-                caravan->setOnCharger(false); // Marcar que não está mais num carregador
+                caravan->setOnCharger(false);
             }
 
-            // Atualiza o mapa para a nova célula
             map.setCell(newRow, newCol, 'C');
             caravan->setPosition(newRow, newCol);
 
-            // Mensagem de sucesso
-            std::cout << "Caravana " << caravanId << " moveu-se para (" << newRow << ", " << newCol << ")." << std::endl;
+            buffer << "Caravana " << caravanId << " moveu-se para (" << newRow << ", " << newCol << ").\n";
             return true;
         }
     }
 
-    std::cout << "Caravana com ID " << caravanId << " nao encontrada." << std::endl;
+    buffer << "Caravana com ID " << caravanId << " nao encontrada.\n";
     return false;
 }
