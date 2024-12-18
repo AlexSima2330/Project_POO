@@ -32,7 +32,10 @@ bool Simulator::moveCaravan(int caravanId, char direction) {
             int oldRow = caravan->getRow();
             int oldCol = caravan->getCol();
 
-            caravan->move(direction);
+            // Converter char para std::string
+            std::string directionStr(1, direction);
+            caravan->move(directionStr);
+
             auto [newRow, newCol] = map.wrapCoordinates(caravan->getRow(), caravan->getCol());
 
             char cellContent = map.getCell(newRow, newCol);
@@ -50,8 +53,7 @@ bool Simulator::moveCaravan(int caravanId, char direction) {
             if (cellContent == 'c') {
                 caravan->refillWater();
                 caravan->setOnCharger(true);
-                buffer << "Caravana " << caravanId << " reabasteceu agua no carregador em ("
-                       << newRow << ", " << newCol << ").\n";
+                buffer << "Caravana " << caravanId << " reabasteceu agua no carregador em (" << newRow << ", " << newCol << ").\n";
             } else {
                 caravan->setOnCharger(false);
             }
@@ -61,9 +63,6 @@ bool Simulator::moveCaravan(int caravanId, char direction) {
 
             buffer << "Caravana " << caravanId << " moveu-se para (" << newRow << ", " << newCol << ").\n";
 
-            // Aqui chamas displayMap() para mostrar imediatamente a alteração.
-            displayMap();
-
             return true;
         }
     }
@@ -72,27 +71,36 @@ bool Simulator::moveCaravan(int caravanId, char direction) {
     return false;
 }
 
-void Simulator::moveCaravanWithDirection(int caravanId, const std::string &direction) {
-    if (direction.size() == 1) {
-        // Se for apenas um caracter, chama moveCaravan diretamente.
-        char dir = direction[0];
-        moveCaravan(caravanId, dir);
-    } else if (direction.size() == 2) {
-        // Trata das direções compostas: CE, CD, BE, BD
-        char dir1 = direction[0];
-        char dir2 = direction[1];
+void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direction) {
+    for (auto caravan : caravans) {
+        if (caravan->getId() == caravanId) {
+            int oldRow = caravan->getRow();
+            int oldCol = caravan->getCol();
 
-        // Primeiro movimento
-        moveCaravan(caravanId, dir1);
-        // Segundo movimento
-        moveCaravan(caravanId, dir2);
+            // Calcular as coordenadas do movimento
+            caravan->move(direction);
+            auto [newRow, newCol] = map.wrapCoordinates(caravan->getRow(), caravan->getCol());
 
-        // Não é necessário chamar displayMap() aqui, pois moveCaravan() já o faz.
-    } else {
-        // Caso a direção tenha mais de 2 caracteres, ou seja inválida
-        std::cout << "Direção inválida: " << direction << std::endl;
+            // Verificar o conteúdo da célula de destino
+            char cellContent = map.getCell(newRow, newCol);
+            if (cellContent == '+') {
+                std::cout << "[Erro] Movimento invalido devido a um obstaculo!" << std::endl;
+                caravan->setPosition(oldRow, oldCol); // Restaura a posição antiga
+                return;
+            }
+
+            // Atualizar o mapa
+            map.setCell(oldRow, oldCol, '.'); // Marca a célula anterior como vazia
+            map.setCell(newRow, newCol, 'C'); // Marca a nova célula com a caravana
+
+            std::cout << "Caravana ID " << caravanId << " moveu-se para (" << newRow << ", " << newCol << ")." << std::endl;
+
+            return;
+        }
     }
+    std::cout << "[Erro] Caravana com ID " << caravanId << " não encontrada." << std::endl;
 }
+
 
 // Novos métodos relacionados a caravanas
 void Simulator::buyCaravan(char cityName, char tipo) {
@@ -100,7 +108,13 @@ void Simulator::buyCaravan(char cityName, char tipo) {
 }
 
 void Simulator::showCaravanDetails(int caravanId) const {
-    cout << "Mostrar detalhes da caravana " << caravanId << " (não implementado)." << endl;
+    for (const auto& caravan : caravans) {
+        if (caravan->getId() == caravanId) {
+            caravan->status();
+            return;
+        }
+    }
+    std::cout << "Caravana com ID " << caravanId << " não encontrada." << std::endl;
 }
 
 void Simulator::buyMerchandise(int caravanId, int amount) {

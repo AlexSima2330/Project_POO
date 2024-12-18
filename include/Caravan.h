@@ -33,7 +33,7 @@ public:
     void setPosition(int newRow, int newCol);
 
     // Movimento
-    virtual void move(char direction); // Mover-se numa direção ('C', 'B', 'D', 'E')
+    virtual void move(const std::string& direction); // Mover-se numa direção ('C', 'B', 'D', 'E')
 
     // Status
     virtual void status() const; // Exibir o estado da caravana
@@ -78,6 +78,7 @@ public:
         if (crew > 0) {
             crew -= amount;
             if (crew < 0) crew = 0; // Evita números negativos
+            std::cout << "[Caravana] ID: " << id << " perdeu " << amount << " tripulantes. Restantes: " << crew << std::endl;
         }
     }
 
@@ -106,7 +107,7 @@ public:
     TradeCaravan(int id);
 
     // Movimento especializado
-    void move(char direction) override;
+    void move(const std::string& direction) override;
 
     // Status especializado
     void status() const override;
@@ -119,7 +120,7 @@ public:
     MilitaryCaravan(int id);
 
     // Movimento especializado
-    void move(char direction) override;
+    void move(const std::string& direction) override;
 
     // Status especializado
     void status() const override;

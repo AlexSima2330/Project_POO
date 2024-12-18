@@ -4,7 +4,7 @@
 #include <fstream>
 #include "Wallet.h"
 #include "Map.h"
-#include "Commands2.h" // se necessário
+#include "Commands.h"
 
 using namespace std;
 
@@ -15,23 +15,23 @@ Simulator::Simulator() : map(0, 0), bufferRows(0), bufferCols(0), buffer(0, 0), 
 void Simulator::run() {
     while (true) {
         bool mapLoaded = false;
-        std::string command;
+        string command;
 
         // Fase 1
         while (!mapLoaded) {
-            std::cout << "Digite 'config <ficheiro>' para carregar o mapa ou 'sair' para terminar: ";
-            if (!std::getline(std::cin, command)) {
+            cout << "Digite 'config <ficheiro>' para carregar o mapa ou 'sair' para terminar: ";
+            if (!getline(cin, command)) {
                 return; // se EOF ou erro, sai do programa
             }
 
             if (command.find("config") == 0) {
-                std::istringstream iss(command);
-                std::string cmd, filename;
+                istringstream iss(command);
+                string cmd, filename;
                 iss >> cmd >> filename;
 
                 if (!filename.empty()) {
                     if (loadMap(filename)) {
-                        std::cout << "Mapa carregado com sucesso do ficheiro: " << filename << std::endl;
+                        cout << "Mapa carregado com sucesso do ficheiro: " << filename << endl;
 
                         // Adicionar caravanas aqui, após o mapa ser carregado
                         Caravan* trade = new TradeCaravan(1);
@@ -46,16 +46,16 @@ void Simulator::run() {
 
                         mapLoaded = true;
                     } else {
-                        std::cerr << "Falha ao carregar o mapa. Tente novamente." << std::endl;
+                        cerr << "Falha ao carregar o mapa. Tente novamente." << endl;
                     }
                 } else {
-                    std::cerr << "Uso incorreto do comando. Exemplo: config <nomeFicheiro>" << std::endl;
+                    cerr << "Uso incorreto do comando. Exemplo: config <nomeFicheiro>" << endl;
                 }
             } else if (command == "sair") {
-                std::cout << "Simulacao terminada." << std::endl;
+                cout << "Simulacao terminada." << endl;
                 return; // Sai do run, termina o programa
             } else {
-                std::cerr << "Comando invalido nesta fase. Use 'config <ficheiro>' ou 'sair'." << std::endl;
+               cerr << "Comando invalido nesta fase. Use 'config <ficheiro>' ou 'sair'." << endl;
             }
         }
 
@@ -63,7 +63,7 @@ void Simulator::run() {
         while (true) {
             displayMap();
 
-            std::cout << "Digite um comando ou 'terminar' para voltar a fase 1.\n"
+            cout << "Digite um comando ou 'terminar' para voltar a fase 1.\n"
      << "Comandos disponiveis na fase 2:\n"
      << "  exec <ficheiro>   - Executa comandos a partir de um ficheiro\n"
      << "  prox <n>          - Avanca a simulacao n instantes\n"
@@ -84,33 +84,32 @@ void Simulator::run() {
      << "  loads <nome>      - Carrega um estado anteriormente guardado\n"
      << "  lists             - Lista os nomes dos estados guardados\n"
      << "  dels <nome>       - Apaga um estado guardado pelo nome\n"
-     << "  terminar          - Termina a simulacao e volta a fase 1\n"
      << "Digite o comando: ";
 
-            if (!std::getline(std::cin, command)) {
+            if (!getline(cin, command)) {
                 return; // se EOF, sai do programa
             }
 
             if (command.find("exec") == 0) {
-                std::istringstream iss(command);
-                std::string cmd, filename;
+                istringstream iss(command);
+                string cmd, filename;
                 iss >> cmd >> filename;
 
                 if (!filename.empty()) {
-                    std::ifstream file(filename);
+                    ifstream file(filename);
                     if (!file.is_open()) {
-                        std::cerr << "Não foi possivel abrir o ficheiro: " << filename << std::endl;
+                        cerr << "Não foi possivel abrir o ficheiro: " << filename << endl;
                     } else {
-                        std::string line;
-                        while (std::getline(file, line)) {
+                        string line;
+                        while (getline(file, line)) {
                             processPhase2Command(*this, line);
                         }
                     }
                 } else {
-                    std::cerr << "Uso incorreto: exec <nomeFicheiro>" << std::endl;
+                    cerr << "Uso incorreto: exec <nomeFicheiro>" << endl;
                 }
             } else if (command == "terminar") {
-                std::cout << "A simulacao terminou. Voltando a fase 1..." << std::endl;
+                cout << "A simulacao terminou. Voltando a fase 1..." << endl;
                 // Aqui não faz return, nem break do programa inteiro,
                 // Apenas break do loop da fase 2, voltando ao loop externo do run()
                 break;
@@ -120,7 +119,6 @@ void Simulator::run() {
         }
     }
 }
-
 
 void Simulator::advanceSimulation(int n) {
     cout << "A avançar " << n << " instantes (não implementado)." << endl;

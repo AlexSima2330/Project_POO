@@ -4,8 +4,8 @@
 using namespace std;
 
 // Construtor da classe base Caravan
-Caravan::Caravan(int id, const string &type, int maxCargo, int maxWater, int row, int col)
-    : id(id), type(type), crew(10), cargo(0), water(maxWater), maxCargo(maxCargo), maxWater(maxWater), row(row), col(col) {}
+Caravan::Caravan(int id, const std::string& type, int maxCargo, int maxWater, int row, int col)
+    : id(id), type(type), row(row), col(col), crew(10), cargo(0), maxCargo(maxCargo), water(maxWater), maxWater(maxWater) {}
 
 // Atualiza a posição da caravana
 void Caravan::setPosition(int newRow, int newCol) {
@@ -14,16 +14,42 @@ void Caravan::setPosition(int newRow, int newCol) {
 }
 
 // Movimento baseado na direção
-void Caravan::move(char direction) {
-    switch (direction) {
-        case 'B': ++row; break;
-        case 'C': --row; break;
-        case 'E': --col; break;
-        case 'D': ++col; break;
-        default:
-            cout << "Direção inválida!" << endl;
+void Caravan::move(const std::string& direction) {
+    if (water > 0) {
+        // Consome água por movimento
+        int waterConsumption = 2; // Exemplo de consumo (podes ajustar)
+        water = std::max(0, water - waterConsumption);
+    } else {
+        // Quando a água é 0, os tripulantes começam a morrer
+        loseCrew(1); // Perde 1 tripulante por movimento
+        if (crew == 0) {
+            std::cout << "[Caravana] ID: " << id << " está sem tripulação e tornou-se inativa!" << std::endl;
+            return;
+        }
+    }
+
+    // Movimento baseado na direção
+    if (direction == "D") {
+        ++col;
+    } else if (direction == "E") {
+        --col;
+    } else if (direction == "C") {
+        --row;
+    } else if (direction == "B") {
+        ++row;
+    } else if (direction == "CE") {
+        --row; --col;
+    } else if (direction == "CD") {
+        --row; ++col;
+    } else if (direction == "BE") {
+        ++row; --col;
+    } else if (direction == "BD") {
+        ++row; ++col;
+    } else {
+        std::cout << "Direção inválida: " << direction << std::endl;
     }
 }
+
 
 // Processa consumo de água e inatividade
 bool Caravan::processMovement(Map &map, int waterConsumption) {
@@ -52,26 +78,28 @@ void Caravan::becomeObstacle(Map &map) {
 
 // Exibe o status básico
 void Caravan::status() const {
-    cout << "[Caravan] ID: " << id << " (" << type << ")"
-              << ", Posicao: (" << row << ", " << col << ")"
-              << ", Carga: " << cargo << "/" << maxCargo
-              << ", Agua: " << water << "/" << maxWater
-              << ", Tripulacao: " << crew << endl;
+    std::cout << "[Caravana] ID: " << id
+              << " (" << type << ")" << std::endl
+              << "Posicao: (" << row << ", " << col << ")" << std::endl
+              << "Tripulacao restante: " << crew << std::endl
+              << "Agua restante: " << water << "/" << maxWater << std::endl
+              << "Carga atual: " << cargo << "/" << maxCargo << " toneladas" << std::endl;
 }
 
 // Construtor da classe TradeCaravan
 TradeCaravan::TradeCaravan(int id) : Caravan(id, "Trade", 40, 200) {}
 
 // Movimento especializado para TradeCaravan
-void TradeCaravan::move(char direction) {
+void TradeCaravan::move(const std::string& direction) {
     cout << "[TradeCaravan] ID: " << id << " a mover-se para " << direction << "." << endl;
-    Caravan::move(direction); // Usa o movimento básico
+    Caravan::move(direction);
 }
 
 // Exibe o status da TradeCaravan
 void TradeCaravan::status() const {
     cout << "[TradeCaravan] ID: " << id
          << ", Posicao: (" << row << ", " << col << ")"
+         << "Tripulação restante: " << crew << "\n"
          << ", Carga: " << cargo << "/" << maxCargo
          << ", Agua: " << water << "/" << maxWater << endl;
 }
@@ -80,9 +108,9 @@ void TradeCaravan::status() const {
 MilitaryCaravan::MilitaryCaravan(int id) : Caravan(id, "Military", 5, 400) {}
 
 // Movimento especializado para MilitaryCaravan
-void MilitaryCaravan::move(char direction) {
+void MilitaryCaravan::move(const std::string& direction) {
     cout << "[MilitaryCaravan] ID: " << id << " a mover-se para " << direction << "." << endl;
-    Caravan::move(direction); // Usa o movimento básico
+    Caravan::move(direction);
 }
 
 // Exibe o status da MilitaryCaravan

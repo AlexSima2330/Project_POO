@@ -16,8 +16,8 @@ set(SOURCE_FILES
         src/city.cpp
         include/Wallet.h
         src/Wallet.cpp
-        src/Commands2.cpp
-        include/Commands2.h
+        src/Commands.cpp
+        include/Commands.h
         src/simulators/Simulator_MapActions.cpp
         src/simulators/Simulator_CaravanActions.cpp
         src/simulators/Simulator_Storage.cpp

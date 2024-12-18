@@ -1,7 +1,7 @@
 //
 // Created by Alexa on 18/12/2024.
 //
-#include "Commands2.h"
+#include "Commands.h"
 #include "Simulator.h"
 #include <iostream>
 #include <sstream>
@@ -30,9 +30,9 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         sim.listCityCaravans(cityName);
     } else if (command.find("caravana") == 0) {
         std::istringstream iss(command);
-        std::string cmd; iss >> cmd;
+        std::string cmd;
         int caravanId;
-        iss >> caravanId;
+        iss >> cmd >> caravanId;
         sim.showCaravanDetails(caravanId);
     } else if (command.find("compra") == 0 && command.substr(0,6) == "compra ") {
         std::istringstream iss(command);
