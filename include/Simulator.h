@@ -20,24 +20,44 @@ private:
 public:
     Simulator();
 
-    // Adiciona uma caravana no mapa
-    void addCaravan(Caravan* caravan, int row, int col);
-
-    // Função principal do simulador
     void run();
 
-    // Atualiza o estado do mapa
+    // Métodos fase 1 / mapa
+    bool loadMap(const std::string& filename);
     void displayMap();
 
-    bool loadMap(const std::string& filename);
-
+    // Métodos de caravanas
+    void addCaravan(Caravan* caravan, int row, int col);
     bool moveCaravan(int caravanId, char direction);
-
     void showCaravanStatus() const;
 
-    // Map para armazenar o estado original de células ocupadas pelas caravanas
-    std::unordered_map<int, char> originalCellContent;
+    // Métodos da fase 2 (organização conforme já discutido):
 
+    // Geral (podes deixar no Simulator.cpp)
+    void advanceSimulation(int n);
+    void showPrices() const;
+    void addCoins(int n);
+
+    // Map/ambiente (Simulator_MapActions.cpp)
+    void listCityCaravans(char cityName) const;
+    void createSandstorm(int l, int c, int r);
+
+    // Caravanas (Simulator_CaravanActions.cpp)
+    void buyCaravan(char cityName, char tipo);
+    void showCaravanDetails(int caravanId) const;
+    void buyMerchandise(int caravanId, int amount);
+    void sellMerchandise(int caravanId);
+    void moveCaravanWithDirection(int caravanId, const std::string &direction);
+    void setCaravanAuto(int caravanId);
+    void stopCaravanAuto(int caravanId);
+    void createBarbarianCaravan(int l, int c);
+    void addCrewToCaravan(int caravanId, int t);
+
+    // Storage (Simulator_Storage.cpp)
+    void saveBufferState(const std::string &nome);
+    void loadBufferState(const std::string &nome);
+    void listSavedStates() const;
+    void deleteSavedState(const std::string &nome);
 };
 
 #endif

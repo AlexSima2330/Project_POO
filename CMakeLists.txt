@@ -7,7 +7,7 @@ include_directories(include) #procura os ficheiros .h auto
 
 set(SOURCE_FILES
         src/main.cpp
-        src/Simulator.cpp
+        src/simulators/Simulator.cpp
         src/Buffer.cpp
         src/Map.cpp
         src/Caravan.cpp
@@ -16,6 +16,11 @@ set(SOURCE_FILES
         src/city.cpp
         include/Wallet.h
         src/Wallet.cpp
+        src/Commands2.cpp
+        include/Commands2.h
+        src/simulators/Simulator_MapActions.cpp
+        src/simulators/Simulator_CaravanActions.cpp
+        src/simulators/Simulator_Storage.cpp
 )
 
 add_executable(Project_POO ${SOURCE_FILES})
