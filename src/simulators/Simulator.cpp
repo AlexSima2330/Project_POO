@@ -34,15 +34,15 @@ void Simulator::run() {
                         cout << "Mapa carregado com sucesso do ficheiro: " << filename << endl;
 
                         // Adicionar caravanas aqui, após o mapa ser carregado
-                        Caravan* trade = new TradeCaravan(1);
-                        trade->setPosition(2, 9);
+                        Caravan* trade = new TradeCaravan(1, 15);
+                        //trade->setPosition(2, 9);
                         addCaravan(trade, 2, 9);
-                        trade->setWater(10);
+                        //trade->setWater(10);
 
-                        Caravan* military = new MilitaryCaravan(2);
-                        military->setPosition(7, 4);
+                        Caravan* military = new MilitaryCaravan(2, 20);
+                        //military->setPosition(7, 4);
                         addCaravan(military, 7, 4);
-                        military->setWater(10);
+                        //military->setWater(10);
 
                         mapLoaded = true;
                     } else {
@@ -65,25 +65,25 @@ void Simulator::run() {
 
             cout << "Digite um comando ou 'terminar' para voltar a fase 1.\n"
      << "Comandos disponiveis na fase 2:\n"
-     << "  exec <ficheiro>   - Executa comandos a partir de um ficheiro\n"
-     << "  prox <n>          - Avanca a simulacao n instantes\n"
-     << "  comprac <C> <T>   - Compra uma caravana do tipo T na cidade C\n"
-     << "  precos            - Lista os precos das mercadorias\n"
+     //<< "  exec <ficheiro>   - Executa comandos a partir de um ficheiro\n"
+     //<< "  prox <n>          - Avanca a simulacao n instantes\n"
+     //<< "  comprac <C> <T>   - Compra uma caravana do tipo T na cidade C\n"
+     //<< "  precos            - Lista os precos das mercadorias\n"
      << "  cidade <C>        - Lista o conteudo da cidade C\n"
      << "  caravana <N>      - Mostra a descricao da caravana N\n"
-     << "  compra <N> <M>    - Compra M toneladas de mercadorias para a caravana N (na cidade)\n"
-     << "  vende <N>         - Vende toda a mercadoria da caravana N (na cidade)\n"
+     //<< "  compra <N> <M>    - Compra M toneladas de mercadorias para a caravana N (na cidade)\n"
+     //<< "  vende <N>         - Vende toda a mercadoria da caravana N (na cidade)\n"
      << "  move <N> <X>      - Move a caravana N na direcao X (D, E, C, B, CE, CD, BE, BD)\n"
-     << "  auto <N>          - Coloca a caravana N em modo auto-gestao\n"
-     << "  stop <N>          - Para o modo auto da caravana N\n"
-     << "  barbaro <l> <c>   - Cria uma caravana barbara em (l, c)\n"
-     << "  areia <l> <c> <r> - Cria uma tempestade de areia em (l,c) com raio r\n"
-     << "  moedas <N>        - Acrescenta N moedas ao jogador (pode ser negativo)\n"
-     << "  tripul <N> <T>    - Adiciona T tripulantes a caravana N (na cidade)\n"
-     << "  saves <nome>      - Guarda o estado atual do buffer com o nome dado\n"
-     << "  loads <nome>      - Carrega um estado anteriormente guardado\n"
-     << "  lists             - Lista os nomes dos estados guardados\n"
-     << "  dels <nome>       - Apaga um estado guardado pelo nome\n"
+     //<< "  auto <N>          - Coloca a caravana N em modo auto-gestao\n"
+     //<< "  stop <N>          - Para o modo auto da caravana N\n"
+     //<< "  barbaro <l> <c>   - Cria uma caravana barbara em (l, c)\n"
+     //<< "  areia <l> <c> <r> - Cria uma tempestade de areia em (l,c) com raio r\n"
+     //<< "  moedas <N>        - Acrescenta N moedas ao jogador (pode ser negativo)\n"
+     //<< "  tripul <N> <T>    - Adiciona T tripulantes a caravana N (na cidade)\n"
+     //<< "  saves <nome>      - Guarda o estado atual do buffer com o nome dado\n"
+    // << "  loads <nome>      - Carrega um estado anteriormente guardado\n"
+    // << "  lists             - Lista os nomes dos estados guardados\n"
+   //  << "  dels <nome>       - Apaga um estado guardado pelo nome\n"
      << "Digite o comando: ";
 
             if (!getline(cin, command)) {

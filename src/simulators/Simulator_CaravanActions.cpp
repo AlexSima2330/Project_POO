@@ -12,13 +12,6 @@ void Simulator::addCaravan(Caravan* caravan, int row, int col) {
     }
 }
 
-void Simulator::showCaravanStatus() const {
-    cout << "Estado das Caravanas:" << endl;
-    for (auto caravan : caravans) {
-        caravan->status();
-    }
-}
-
 bool Simulator::moveCaravan(int caravanId, char direction) {
     for (auto caravan : caravans) {
         if (caravan->getId() == caravanId) {

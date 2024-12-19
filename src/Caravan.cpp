@@ -4,8 +4,8 @@
 using namespace std;
 
 // Construtor da classe base Caravan
-Caravan::Caravan(int id, const std::string& type, int maxCargo, int maxWater, int row, int col)
-    : id(id), type(type), row(row), col(col), crew(10), cargo(0), maxCargo(maxCargo), water(maxWater), maxWater(maxWater) {}
+Caravan::Caravan(int id, const std::string &type, int row, int col)
+    : id(id), type(type), row(row), col(col), cargo(0), water(0), maxCargo(0), maxWater(0), crew(0) {}
 
 // Atualiza a posição da caravana
 void Caravan::setPosition(int newRow, int newCol) {
@@ -15,15 +15,13 @@ void Caravan::setPosition(int newRow, int newCol) {
 
 // Movimento baseado na direção
 void Caravan::move(const std::string& direction) {
-    if (water > 0) {
-        // Consome água por movimento
-        int waterConsumption = 2; // Exemplo de consumo (podes ajustar)
-        water = std::max(0, water - waterConsumption);
+    int waterConsumption = consumeWater();
+    if (water >= waterConsumption) {
+        water -= waterConsumption;
     } else {
-        // Quando a água é 0, os tripulantes começam a morrer
-        loseCrew(1); // Perde 1 tripulante por movimento
+        loseCrew(1);
         if (crew == 0) {
-            std::cout << "[Caravana] ID: " << id << " está sem tripulação e tornou-se inativa!" << std::endl;
+            std::cout << "[Caravan] ID: " << id << " esta sem tripulacao e tornou-se inativa!" << std::endl;
             return;
         }
     }
@@ -81,13 +79,23 @@ void Caravan::status() const {
     std::cout << "[Caravana] ID: " << id
               << " (" << type << ")" << std::endl
               << "Posicao: (" << row << ", " << col << ")" << std::endl
-              << "Tripulacao restante: " << crew << std::endl
+              << "Tripulacao atual: " << crew << std::endl
               << "Agua restante: " << water << "/" << maxWater << std::endl
               << "Carga atual: " << cargo << "/" << maxCargo << " toneladas" << std::endl;
 }
 
 // Construtor da classe TradeCaravan
-TradeCaravan::TradeCaravan(int id) : Caravan(id, "Trade", 40, 200) {}
+TradeCaravan::TradeCaravan(int id, int initialCrew)
+    : Caravan(id, "Trade") {
+    maxCargo = 40;       // Capacidade máxima de carga para TradeCaravan
+    maxWater = 200;      // Capacidade máxima de água
+    water = maxWater;    // Inicia com tanque cheio
+    crew = initialCrew;  // Número inicial de tripulantes
+}
+
+int TradeCaravan::consumeWater() const {
+    return crew > 10 ? 3 : 2;
+}
 
 // Movimento especializado para TradeCaravan
 void TradeCaravan::move(const std::string& direction) {
@@ -95,28 +103,22 @@ void TradeCaravan::move(const std::string& direction) {
     Caravan::move(direction);
 }
 
-// Exibe o status da TradeCaravan
-void TradeCaravan::status() const {
-    cout << "[TradeCaravan] ID: " << id
-         << ", Posicao: (" << row << ", " << col << ")"
-         << "Tripulação restante: " << crew << "\n"
-         << ", Carga: " << cargo << "/" << maxCargo
-         << ", Agua: " << water << "/" << maxWater << endl;
-}
 
 // Construtor da classe MilitaryCaravan
-MilitaryCaravan::MilitaryCaravan(int id) : Caravan(id, "Military", 5, 400) {}
+MilitaryCaravan::MilitaryCaravan(int id, int initialCrew)
+    : Caravan(id, "Military") {
+    maxCargo = 5;        // Capacidade máxima de carga para MilitaryCaravan
+    maxWater = 400;      // Capacidade máxima de água
+    water = maxWater;    // Inicia com tanque cheio
+    crew = initialCrew;  // Número inicial de tripulantes
+}
+
+int MilitaryCaravan::consumeWater() const {
+    return 5; // Sempre consome 5 por movimento
+}
 
 // Movimento especializado para MilitaryCaravan
 void MilitaryCaravan::move(const std::string& direction) {
     cout << "[MilitaryCaravan] ID: " << id << " a mover-se para " << direction << "." << endl;
     Caravan::move(direction);
-}
-
-// Exibe o status da MilitaryCaravan
-void MilitaryCaravan::status() const {
-    cout << "[MilitaryCaravan] ID: " << id
-         << ", Posicao: (" << row << ", " << col << ")"
-         << ", Tripulacao: " << crew
-         << ", Agua: " << water << "/" << maxWater << endl;
 }

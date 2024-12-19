@@ -12,19 +12,16 @@ class Caravan {
 protected:
     int id;              // Identificador único da caravana
     int crew;            // Número de membros da tripulação
-    int cargo;           // Carga atual
-    int water;           // Quantidade de água disponível
-    int maxCargo;        // Capacidade máxima de carga
-    int maxWater;        // Capacidade máxima de água
-    int row;             // Linha (posição atual no mapa)
-    int col;             // Coluna (posição atual no mapa)
-    std::string type;    // Tipo da caravana (ex.: Comércio, Militar)
+    int cargo, maxCargo;          // Carga atual
+    int water, maxWater;           // Quantidade de água disponível
+    int row, col;             // Linha (posição atual no mapa)// Coluna (posição atual no mapa)
+    std::string type;
     bool onCharger = false;
     bool inCity = false;
 
 public:
     // Construtor
-    Caravan(int id, const std::string &type, int maxCargo, int maxWater, int row = -1, int col = -1);
+    Caravan(int id, const std::string &type, int row = -1, int col = -1);
 
     // Métodos básicos
     int getId() const { return id; }
@@ -44,18 +41,11 @@ public:
     // Converte a caravana para um obstáculo no mapa
     void becomeObstacle(Map &map);
 
-    // Destrutor virtual
-    virtual ~Caravan() = default;
-
     void addResource(); // Coletar recursos
 
     int getWater() const { return water; }
 
-    void consumeWater(int amount) {
-        if (amount > 0 && water >= amount) {
-            water -= amount;
-        }
-    }
+    virtual int consumeWater() const = 0;
 
     void setWater(int amount) {
         if (amount >= 0 && amount <= maxWater) {
@@ -98,32 +88,34 @@ public:
     bool isInCity() const { return inCity; }
     void setInCity(bool value) { inCity = value; }
 
+    virtual ~Caravan() = default;
+
 };
 
 // Classe TradeCaravan (Caravana de Comércio)
 class TradeCaravan : public Caravan {
 public:
     // Construtor
-    TradeCaravan(int id);
+    TradeCaravan(int id, int initialCrew);
 
     // Movimento especializado
     void move(const std::string& direction) override;
 
-    // Status especializado
-    void status() const override;
+    int consumeWater() const override;
+
 };
 
 // Classe MilitaryCaravan (Caravana Militar)
 class MilitaryCaravan : public Caravan {
 public:
     // Construtor
-    MilitaryCaravan(int id);
+    MilitaryCaravan(int id, int initialCrew);
 
     // Movimento especializado
     void move(const std::string& direction) override;
 
-    // Status especializado
-    void status() const override;
+    int consumeWater() const override;
+
 };
 
 #endif
