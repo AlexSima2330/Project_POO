@@ -15,17 +15,6 @@ void Caravan::setPosition(int newRow, int newCol) {
 
 // Movimento baseado na direção
 void Caravan::move(const std::string& direction) {
-    int waterConsumption = consumeWater();
-    if (water >= waterConsumption) {
-        water -= waterConsumption;
-    } else {
-        loseCrew(1);
-        if (crew == 0) {
-            std::cout << "[Caravan] ID: " << id << " esta sem tripulacao e tornou-se inativa!" << std::endl;
-            return;
-        }
-    }
-
     // Movimento baseado na direção
     if (direction == "D") {
         ++col;
@@ -50,51 +39,51 @@ void Caravan::move(const std::string& direction) {
 
 
 // Processa consumo de água e inatividade
-bool Caravan::processMovement(Map &map, int waterConsumption) {
+bool Caravan::processMovement(Map& map) {
+    int waterConsumption = consumeWater(); // Consumo de água específico da subclasse
     if (water >= waterConsumption) {
-        water -= waterConsumption;
+        water -= waterConsumption; // Reduz a água disponível
         return true; // Movimento permitido
     }
 
-    loseCrew(10); // Perde tripulantes por falta de água
-    cout << "[Caravana] ID: " << id << " sem agua suficiente. Perdeu 2 tripulantes. Tripulantes restantes: " << crew << endl;
+    loseCrew(1); // Perde 1 tripulante por falta de água
+    std::cout << "[Caravana] ID: " << id << " sem água suficiente. Perdeu 1 tripulante. Tripulantes restantes: " << crew << std::endl;
 
-    // Se ficar inativa, transforma-se em obstáculo
     if (!isActive()) {
-        becomeObstacle(map);
-        return false;
+        return false; // Movimento não permitido se não houver tripulantes
     }
-    return true; // Continua a tentar mover
+
+    return true; // Movimento permitido, mas com penalização
 }
 
-// Transforma a caravana em obstáculo
-void Caravan::becomeObstacle(Map &map) {
-    auto [wrappedRow, wrappedCol] = map.wrapCoordinates(row, col);
-    map.setCell(wrappedRow, wrappedCol, '+');
-    cout << "[Caravana] ID: " << id << " tornou-se um obstaculo em (" << wrappedRow << ", " << wrappedCol << ")." << endl;
-}
 
 // Exibe o status básico
 void Caravan::status() const {
     std::cout << "[Caravana] ID: " << id
-              << " (" << type << ")" << std::endl
-              << "Posicao: (" << row << ", " << col << ")" << std::endl
-              << "Tripulacao atual: " << crew << std::endl
-              << "Agua restante: " << water << "/" << maxWater << std::endl
-              << "Carga atual: " << cargo << "/" << maxCargo << " toneladas" << std::endl;
+              << " (" << type << ")"
+              << ", Posicao: (" << row << ", " << col << ")"
+              << ", Tripulacao atual: " << crew
+              << ", Carga atual: " << cargo << "/" << maxCargo << "T"
+              << ", Agua atual: " << water << "/" << maxWater  << std::endl;
 }
 
 // Construtor da classe TradeCaravan
 TradeCaravan::TradeCaravan(int id, int initialCrew)
     : Caravan(id, "Trade") {
-    maxCargo = 40;       // Capacidade máxima de carga para TradeCaravan
-    maxWater = 200;      // Capacidade máxima de água
+    maxCargo = 5;       // Capacidade máxima de carga para TradeCaravan
+    maxWater = 400;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;  // Número inicial de tripulantes
 }
 
 int TradeCaravan::consumeWater() const {
-    return crew > 10 ? 3 : 2;
+    if (crew == 0) {
+        return 0; // Sem tripulantes, não consome água
+    } else if (crew <= 10) {
+        return 1; // Metade ou menos dos tripulantes
+    } else {
+        return 2; // Mais de 10 tripulantes
+    }
 }
 
 // Movimento especializado para TradeCaravan
@@ -114,7 +103,11 @@ MilitaryCaravan::MilitaryCaravan(int id, int initialCrew)
 }
 
 int MilitaryCaravan::consumeWater() const {
-    return 5; // Sempre consome 5 por movimento
+    if (crew == 0 || crew <= 10) {
+        return 1; // Sem tripulantes ou metade ou menos dos tripulantes
+    } else {
+        return 3; // Mais de 10 tripulantes
+    }
 }
 
 // Movimento especializado para MilitaryCaravan

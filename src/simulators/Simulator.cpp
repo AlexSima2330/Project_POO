@@ -34,15 +34,18 @@ void Simulator::run() {
                         cout << "Mapa carregado com sucesso do ficheiro: " << filename << endl;
 
                         // Adicionar caravanas aqui, após o mapa ser carregado
-                        Caravan* trade = new TradeCaravan(1, 15);
-                        //trade->setPosition(2, 9);
+                        Caravan* trade = new TradeCaravan(1, 20);
+                        trade->setPosition(2, 9);
                         addCaravan(trade, 2, 9);
                         //trade->setWater(10);
 
-                        Caravan* military = new MilitaryCaravan(2, 20);
-                        //military->setPosition(7, 4);
+                        Caravan* military = new MilitaryCaravan(2, 40);
+                        military->setPosition(7, 4);
                         addCaravan(military, 7, 4);
                         //military->setWater(10);
+
+                        trade->processMovement(map);     // Para a TradeCaravan
+                        military->processMovement(map); // Para a MilitaryCaravan
 
                         mapLoaded = true;
                     } else {

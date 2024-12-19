@@ -36,10 +36,7 @@ public:
     virtual void status() const; // Exibir o estado da caravana
 
     // Processamento do movimento e penalidades
-    bool processMovement(Map &map, int waterConsumption);
-
-    // Converte a caravana para um obstáculo no mapa
-    void becomeObstacle(Map &map);
+    bool processMovement(Map &map);
 
     void addResource(); // Coletar recursos
 

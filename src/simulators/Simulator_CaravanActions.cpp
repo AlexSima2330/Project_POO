@@ -15,54 +15,30 @@ void Simulator::addCaravan(Caravan* caravan, int row, int col) {
 bool Simulator::moveCaravan(int caravanId, char direction) {
     for (auto caravan : caravans) {
         if (caravan->getId() == caravanId) {
-            const int waterConsumptionPerMove = 10;
-
-            if (!caravan->processMovement(map, waterConsumptionPerMove)) {
-                buffer << "Caravana " << caravanId << " ficou inativa e tornou-se um obstáculo.\n";
+            // Processa o consumo de água antes do movimento
+            if (!caravan->processMovement(map)) {
+                std::cout << "Caravana " << caravanId << " não pode mover-se devido à falta de água ou tripulantes." << std::endl;
                 return false;
             }
 
-            int oldRow = caravan->getRow();
-            int oldCol = caravan->getCol();
-
-            // Converter char para std::string
+            // Executa o movimento
             std::string directionStr(1, direction);
             caravan->move(directionStr);
 
-            auto [newRow, newCol] = map.wrapCoordinates(caravan->getRow(), caravan->getCol());
-
-            char cellContent = map.getCell(newRow, newCol);
-            if (cellContent == '+' || cellContent == 'b' || cellContent == 'a') {
-                caravan->setPosition(oldRow, oldCol);
-                buffer << "[Caravana] ID: " << caravanId << " nao pode ultrapassar obstaculos. Movimento invalido.\n";
-                return false;
-            }
-
-            auto [wrappedOldRow, wrappedOldCol] = map.wrapCoordinates(oldRow, oldCol);
-            if (map.getCell(wrappedOldRow, wrappedOldCol) == 'C') {
-                map.setCell(wrappedOldRow, wrappedOldCol, caravan->wasOnCharger() ? 'c' : '.');
-            }
-
-            if (cellContent == 'c') {
-                caravan->refillWater();
-                caravan->setOnCharger(true);
-                buffer << "Caravana " << caravanId << " reabasteceu agua no carregador em (" << newRow << ", " << newCol << ").\n";
-            } else {
-                caravan->setOnCharger(false);
-            }
-
+            // Atualiza a posição no mapa
+            int newRow = caravan->getRow();
+            int newCol = caravan->getCol();
             map.setCell(newRow, newCol, 'C');
-            caravan->setPosition(newRow, newCol);
 
-            buffer << "Caravana " << caravanId << " moveu-se para (" << newRow << ", " << newCol << ").\n";
-
+            std::cout << "Caravana " << caravanId << " moveu-se para (" << newRow << ", " << newCol << ")." << std::endl;
             return true;
         }
     }
-
-    buffer << "Caravana com ID " << caravanId << " nao encontrada.\n";
+    std::cout << "Caravana com ID " << caravanId << " não encontrada." << std::endl;
     return false;
 }
+
+
 
 void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direction) {
     for (auto caravan : caravans) {
