@@ -1,4 +1,5 @@
 #include "Simulator.h"
+#include "BarbarianCaravan.h"
 #include <iostream>
 
 using namespace std;
@@ -106,8 +107,18 @@ void Simulator::stopCaravanAuto(int caravanId) {
 }
 
 void Simulator::createBarbarianCaravan(int l, int c) {
-    cout << "Criar caravana bárbara em (" << l << "," << c << ") (não implementado)." << endl;
+    // Verifica se a posição é válida e desocupada
+    if (map.getCell(l, c) == '.') {
+        Caravan* barbarian = new BarbarianCaravan(caravans.size() + 1); // ID único
+        barbarian->setPosition(l, c);
+        caravans.push_back(barbarian); // Adiciona à lista de caravanas
+        map.setCell(l, c, '!'); // Marca no mapa com o símbolo de caravana bárbara
+        cout << "Caravana bárbara criada na posição (" << l << ", " << c << ")." << endl;
+    } else {
+        cerr << "Erro: Não é possível criar uma caravana bárbara em (" << l << ", " << c << "). Posição inválida ou ocupada." << endl;
+    }
 }
+
 
 void Simulator::addCrewToCaravan(int caravanId, int t) {
     cout << "Adicionar " << t << " tripulantes à caravana " << caravanId << " (não implementado)." << endl;
