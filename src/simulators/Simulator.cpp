@@ -81,7 +81,7 @@ void Simulator::run() {
      //<< "  stop <N>          - Para o modo auto da caravana N\n"
      //<< "  barbaro <l> <c>   - Cria uma caravana barbara em (l, c)\n"
      //<< "  areia <l> <c> <r> - Cria uma tempestade de areia em (l,c) com raio r\n"
-     //<< "  moedas <N>        - Acrescenta N moedas ao jogador (pode ser negativo)\n"
+     << "  moedas <N>        - Acrescenta N moedas ao jogador (pode ser negativo)\n"
      //<< "  tripul <N> <T>    - Adiciona T tripulantes a caravana N (na cidade)\n"
      //<< "  saves <nome>      - Guarda o estado atual do buffer com o nome dado\n"
     // << "  loads <nome>      - Carrega um estado anteriormente guardado\n"
@@ -140,5 +140,6 @@ void Simulator::showPrices() const {
 }
 
 void Simulator::addCoins(int n) {
-    cout << "Adicionar " << n << " moedas (não implementado)." << endl;
+    wallet.addCoins(n); // Usa a funcionalidade da Wallet
+    cout << "Moedas atualizadas. Novo saldo: " << wallet.getCoins() << endl;
 }

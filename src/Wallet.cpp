@@ -9,6 +9,7 @@ int Wallet::getCoins() const {
 
 void Wallet::addCoins(int amount) {
     coins += amount;
+    if (coins < 0) coins = 0;
 }
 
 bool Wallet::deductCoins(int amount) {
