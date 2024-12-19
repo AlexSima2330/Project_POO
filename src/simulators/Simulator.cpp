@@ -68,8 +68,8 @@ void Simulator::run() {
 
             cout << "Digite um comando ou 'terminar' para voltar a fase 1.\n"
      << "Comandos disponiveis na fase 2:\n"
-     //<< "  exec <ficheiro>   - Executa comandos a partir de um ficheiro\n"
-     << "  prox <n>          - Avanca a simulacao n instantes\n"
+     << "  exec <ficheiro>   - Executa comandos a partir de um ficheiro\n"
+     //<< "  prox <n>          - Avanca a simulacao n instantes\n"
      //<< "  comprac <C> <T>   - Compra uma caravana do tipo T na cidade C\n"
      //<< "  precos            - Lista os precos das mercadorias\n"
      //<< "  cidade <C>        - Lista o conteudo da cidade C\n"
@@ -94,24 +94,29 @@ void Simulator::run() {
             }
 
             if (command.find("exec") == 0) {
-                istringstream iss(command);
-                string cmd, filename;
+                std::istringstream iss(command);
+                std::string cmd, filename;
                 iss >> cmd >> filename;
 
-                if (!filename.empty()) {
-                    ifstream file(filename);
-                    if (!file.is_open()) {
-                        cerr << "Não foi possivel abrir o ficheiro: " << filename << endl;
-                    } else {
-                        string line;
-                        while (getline(file, line)) {
-                            processPhase2Command(*this, line);
-                        }
-                    }
-                } else {
-                    cerr << "Uso incorreto: exec <nomeFicheiro>" << endl;
+                if (filename.empty()) {
+                    filename = "run_commands.txt"; // Nome padrão
                 }
-            } else if (command == "terminar") {
+
+                // Caminho do ficheiro na pasta "config"
+                std::string filepath = "./config/" + filename;
+
+                ifstream file(filepath);
+                if (!file.is_open()) {
+                    cerr << "Não foi possível abrir o ficheiro: " << filepath << endl;
+                } else {
+                    std::cout << "A executar comandos do ficheiro: " << filepath << std::endl;
+                    string line;
+                    while (getline(file, line)) {
+                        processPhase2Command(*this, line); // Executa cada comando do ficheiro
+                    }
+                }
+            }
+            else if (command == "terminar") {
                 cout << "A simulacao terminou. Voltando a fase 1..." << endl;
                 // Aqui não faz return, nem break do programa inteiro,
                 // Apenas break do loop da fase 2, voltando ao loop externo do run()
