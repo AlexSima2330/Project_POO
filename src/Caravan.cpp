@@ -115,3 +115,9 @@ void MilitaryCaravan::move(const std::string& direction) {
     cout << "[MilitaryCaravan] ID: " << id << " a mover-se para " << direction << "." << endl;
     Caravan::move(direction);
 }
+
+void Caravan::becomeObstacle(Map &map) {
+    auto [wrappedRow, wrappedCol] = map.wrapCoordinates(row, col);
+    map.setCell(wrappedRow, wrappedCol, '+'); // Marca como obstáculo no mapa
+    cout << "[Caravana] ID: " << id << " tornou-se um obstáculo em (" << wrappedRow << ", " << wrappedCol << ")." << endl;
+}

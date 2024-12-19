@@ -38,6 +38,7 @@ public:
 
     // Processamento do movimento e penalidades
     bool processMovement(Map &map);
+    void becomeObstacle(Map &map);
 
     void addResource(); // Coletar recursos
 

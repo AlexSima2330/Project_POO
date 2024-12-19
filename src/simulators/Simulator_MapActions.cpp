@@ -76,5 +76,40 @@ void Simulator::listCityCaravans(char cityName) const {
 }
 
 void Simulator::createSandstorm(int l, int c, int r) {
-    cout << "Criar tempestade de areia em (" << l << "," << c << ") com raio " << r << " (não implementado)." << endl;
+    cout << "Criando tempestade de areia no centro (" << l << ", " << c << ") com raio " << r << "." << endl;
+
+    // Percorre o quadrado definido pelo raio
+    for (int i = l - r; i <= l + r; ++i) {
+        for (int j = c - r; j <= c + r; ++j) {
+            // Ajusta as coordenadas para o comportamento circular
+            auto [wrappedRow, wrappedCol] = map.wrapCoordinates(i, j);
+
+            // Verifica o que existe na célula
+            char cellContent = map.getCell(wrappedRow, wrappedCol);
+
+            if (cellContent == 'C') { // Caravana do usuário
+                cout << "Caravana afetada pela tempestade em (" << wrappedRow << ", " << wrappedCol << ")." << endl;
+                for (auto caravan : caravans) {
+                    if (caravan->getRow() == wrappedRow && caravan->getCol() == wrappedCol) {
+                        caravan->loseCrew(10); // Reduz tripulantes
+                        if (!caravan->isActive()) {
+                            caravan->becomeObstacle(map); // Torna-se obstáculo se inativa
+                        }
+                    }
+                }
+            } else if (cellContent == '!') { // Caravana bárbara
+                cout << "Caravana bárbara afetada pela tempestade em (" << wrappedRow << ", " << wrappedCol << ")." << endl;
+                for (auto caravan : caravans) {
+                    if (caravan->getRow() == wrappedRow && caravan->getCol() == wrappedCol) {
+                        caravan->loseCrew(10); // Reduz tripulantes
+                        if (!caravan->isActive()) {
+                            caravan->becomeObstacle(map); // Torna-se obstáculo se inativa
+                        }
+                    }
+                }
+            } else {
+                cout << "Nenhum elemento afetado em (" << wrappedRow << ", " << wrappedCol << ")." << endl;
+            }
+        }
+    }
 }
