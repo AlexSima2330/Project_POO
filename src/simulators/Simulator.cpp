@@ -79,7 +79,7 @@ void Simulator::run() {
      << "  move <N> <X>      - Move a caravana N na direcao X (D, E, C, B, CE, CD, BE, BD)\n"
      //<< "  auto <N>          - Coloca a caravana N em modo auto-gestao\n"
      //<< "  stop <N>          - Para o modo auto da caravana N\n"
-     //<< "  barbaro <l> <c>   - Cria uma caravana barbara em (l, c)\n"
+     << "  barbaro <l> <c>   - Cria uma caravana barbara em (l, c)\n"
      //<< "  areia <l> <c> <r> - Cria uma tempestade de areia em (l,c) com raio r\n"
      << "  moedas <N>        - Acrescenta N moedas ao jogador (pode ser negativo)\n"
      //<< "  tripul <N> <T>    - Adiciona T tripulantes a caravana N (na cidade)\n"
