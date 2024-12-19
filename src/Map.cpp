@@ -111,5 +111,5 @@ char Map::getCell(int row, int col) const {
 // Setter para modificar o conteúdo de uma célula (usando coordenadas circulares)
 void Map::setCell(int row, int col, char value) {
     auto [wrappedRow, wrappedCol] = wrapCoordinates(row, col);
-    grid[wrappedRow][wrappedCol] = value;
+    grid[wrappedRow][wrappedCol] = value; // Define diretamente o valor
 }

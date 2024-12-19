@@ -6,7 +6,7 @@ using namespace std;
 void Simulator::addCaravan(Caravan* caravan, int row, int col) {
     if (map.getCell(row, col) == '.') {
         caravans.push_back(caravan);
-        map.setCell(row, col, 'C');
+        map.setCell(row, col, '0' + caravan->getId()); // Insere o ID da caravana como char
     } else {
         cerr << "Erro: Posicao (" << row << ", " << col << ") ocupada ou invalida para a Caravana." << endl;
     }
@@ -38,38 +38,41 @@ bool Simulator::moveCaravan(int caravanId, char direction) {
     return false;
 }
 
-
-
 void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direction) {
     for (auto caravan : caravans) {
         if (caravan->getId() == caravanId) {
             int oldRow = caravan->getRow();
             int oldCol = caravan->getCol();
 
-            // Calcular as coordenadas do movimento
-            caravan->move(direction);
-            auto [newRow, newCol] = map.wrapCoordinates(caravan->getRow(), caravan->getCol());
-
-            // Verificar o conteúdo da célula de destino
-            char cellContent = map.getCell(newRow, newCol);
-            if (cellContent == '+') {
-                std::cout << "[Erro] Movimento invalido devido a um obstaculo!" << std::endl;
-                caravan->setPosition(oldRow, oldCol); // Restaura a posição antiga
+            // Processa o movimento
+            if (!caravan->processMovement(map)) {
+                std::cout << "[Erro] Caravana " << caravanId << " não pode mover-se devido a falta de água." << std::endl;
                 return;
             }
 
-            // Atualizar o mapa
-            map.setCell(oldRow, oldCol, '.'); // Marca a célula anterior como vazia
-            map.setCell(newRow, newCol, 'C'); // Marca a nova célula com a caravana
+            caravan->move(direction);
+            auto [newRow, newCol] = map.wrapCoordinates(caravan->getRow(), caravan->getCol());
 
-            std::cout << "Caravana ID " << caravanId << " moveu-se para (" << newRow << ", " << newCol << ")." << std::endl;
+            // Verifica se o destino é válido
+            char cellContent = map.getCell(newRow, newCol);
+            if (cellContent != '.') { // Verifica se a célula está vazia
+                std::cout << "[Erro] Movimento inválido para posição ocupada ou obstáculo!" << std::endl;
+                caravan->setPosition(oldRow, oldCol);
+                return;
+            }
+
+            // Atualiza o mapa
+            map.setCell(oldRow, oldCol, '.'); // Limpa a célula antiga
+            map.setCell(newRow, newCol, '0' + caravanId); // Atualiza com o ID da caravana
+
+            // Exibe o status atualizado
+            caravan->status();
 
             return;
         }
     }
     std::cout << "[Erro] Caravana com ID " << caravanId << " não encontrada." << std::endl;
 }
-
 
 // Novos métodos relacionados a caravanas
 void Simulator::buyCaravan(char cityName, char tipo) {

@@ -91,6 +91,9 @@ void Buffer::putChar(char c) {
         if (cursorCol >= cols) {
             cursorCol = 0;
             cursorRow++;
+            if (cursorRow >= rows) {
+                cursorRow = 0; // Volta ao início em caso de overflow
+            }
         }
     }
 }

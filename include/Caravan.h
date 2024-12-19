@@ -18,6 +18,7 @@ protected:
     std::string type;
     bool onCharger = false;
     bool inCity = false;
+    int movesThisTurn;
 
 public:
     // Construtor
@@ -85,6 +86,20 @@ public:
     bool isInCity() const { return inCity; }
     void setInCity(bool value) { inCity = value; }
 
+    void resetMoves() {
+        movesThisTurn = 0;
+    }
+
+    void incrementMove() {
+        movesThisTurn++;
+    }
+
+    bool canMove() const {
+        return movesThisTurn < getMaxMovesPerTurn();
+    }
+
+    virtual int getMaxMovesPerTurn() const = 0;
+
     virtual ~Caravan() = default;
 
 };
@@ -100,6 +115,8 @@ public:
 
     int consumeWater() const override;
 
+    int getMaxMovesPerTurn() const override { return 2; }
+
 };
 
 // Classe MilitaryCaravan (Caravana Militar)
@@ -112,6 +129,8 @@ public:
     void move(const std::string& direction) override;
 
     int consumeWater() const override;
+
+    int getMaxMovesPerTurn() const override { return 3; }
 
 };
 

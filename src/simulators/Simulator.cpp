@@ -69,10 +69,10 @@ void Simulator::run() {
             cout << "Digite um comando ou 'terminar' para voltar a fase 1.\n"
      << "Comandos disponiveis na fase 2:\n"
      //<< "  exec <ficheiro>   - Executa comandos a partir de um ficheiro\n"
-     //<< "  prox <n>          - Avanca a simulacao n instantes\n"
+     << "  prox <n>          - Avanca a simulacao n instantes\n"
      //<< "  comprac <C> <T>   - Compra uma caravana do tipo T na cidade C\n"
      //<< "  precos            - Lista os precos das mercadorias\n"
-     << "  cidade <C>        - Lista o conteudo da cidade C\n"
+     //<< "  cidade <C>        - Lista o conteudo da cidade C\n"
      << "  caravana <N>      - Mostra a descricao da caravana N\n"
      //<< "  compra <N> <M>    - Compra M toneladas de mercadorias para a caravana N (na cidade)\n"
      //<< "  vende <N>         - Vende toda a mercadoria da caravana N (na cidade)\n"
@@ -124,7 +124,15 @@ void Simulator::run() {
 }
 
 void Simulator::advanceSimulation(int n) {
-    cout << "A avançar " << n << " instantes (não implementado)." << endl;
+    for (int i = 0; i < n; ++i) {
+        // Reseta movimentos de todas as caravanas
+        for (auto caravan : caravans) {
+            caravan->resetMoves();
+        }
+
+        // Processa comportamentos automáticos (se existirem)
+        std::cout << "Avançou " << (i + 1) << " instante(s)." << std::endl;
+    }
 }
 
 void Simulator::showPrices() const {

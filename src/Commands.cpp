@@ -9,10 +9,11 @@
 void processPhase2Command(Simulator &sim, const std::string &command) {
     if (command.find("prox") == 0) {
         std::istringstream iss(command);
-        std::string cmd; iss >> cmd;
-        int n = 1;
-        if (!(iss >> n)) n = 1;
-        if (n <= 0) n = 1;
+        std::string cmd;
+        int n = 1; // Valor padrão de 1 instante
+        iss >> cmd >> n;
+
+        if (n <= 0) n = 1; // Garantir que o valor seja válido
         sim.advanceSimulation(n);
     } else if (command.find("comprac") == 0) {
         std::istringstream iss(command);
