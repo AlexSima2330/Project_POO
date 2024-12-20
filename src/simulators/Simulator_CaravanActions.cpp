@@ -45,6 +45,16 @@ void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direc
             int oldRow = caravan->getRow();
             int oldCol = caravan->getCol();
 
+            // Verifica se a caravana está numa cidade e remove-a se estiver
+            if (caravan->isInCity()) {
+                City* city = map.getCityAt(oldRow, oldCol);
+                if (city) {
+                    city->removeCaravan(caravan);
+                    caravan->setInCity(false);
+                    std::cout << "Caravana " << caravanId << " saiu da cidade " << city->getName() << "." << std::endl;
+                }
+            }
+
             // Processa o movimento
             if (!caravan->processMovement(map)) {
                 std::cout << "[Erro] Caravana " << caravanId << " não pode mover-se devido a falta de água." << std::endl;
@@ -54,21 +64,25 @@ void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direc
             caravan->move(direction);
             auto [newRow, newCol] = map.wrapCoordinates(caravan->getRow(), caravan->getCol());
 
-            // Verifica se o destino é válido
-            char cellContent = map.getCell(newRow, newCol);
-            if (cellContent != '.') { // Verifica se a célula está vazia
-                std::cout << "[Erro] Movimento inválido para posição ocupada ou obstáculo!" << std::endl;
-                caravan->setPosition(oldRow, oldCol);
-                return;
+            // Atualiza a célula antiga (limpa a caravana se não for uma cidade)
+            if (!map.isCity(oldRow, oldCol)) {
+                map.setCell(oldRow, oldCol, '.');
             }
 
-            // Atualiza o mapa
-            map.setCell(oldRow, oldCol, '.'); // Limpa a célula antiga
-            map.setCell(newRow, newCol, '0' + caravanId); // Atualiza com o ID da caravana
+            // Verifica se o destino é uma cidade
+            if (map.isCity(newRow, newCol)) {
+                City* city = map.getCityAt(newRow, newCol);
+                if (city) {
+                    city->addCaravan(caravan);
+                    caravan->setInCity(true);
+                    std::cout << "Caravana " << caravanId << " entrou na cidade " << city->getName() << "." << std::endl;
+                    return; // Não altera o mapa visual, a caravana está "dentro" da cidade
+                }
+            }
 
-            // Exibe o status atualizado
+            // Atualiza a nova posição com o ID da caravana
+            map.setCell(newRow, newCol, '0' + caravanId);
             caravan->status();
-
             return;
         }
     }

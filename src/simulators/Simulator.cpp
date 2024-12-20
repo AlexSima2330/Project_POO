@@ -35,8 +35,8 @@ void Simulator::run() {
 
                         // Adicionar caravanas aqui, após o mapa ser carregado
                         Caravan* trade = new TradeCaravan(1, 20);
-                        trade->setPosition(2, 9);
-                        addCaravan(trade, 2, 9);
+                        trade->setPosition(2, 7);
+                        addCaravan(trade, 2, 7);
                         //trade->setWater(10);
 
                         Caravan* military = new MilitaryCaravan(2, 40);
@@ -72,7 +72,7 @@ void Simulator::run() {
      //<< "  prox <n>          - Avanca a simulacao n instantes\n"
      //<< "  comprac <C> <T>   - Compra uma caravana do tipo T na cidade C\n"
      //<< "  precos            - Lista os precos das mercadorias\n"
-     //<< "  cidade <C>        - Lista o conteudo da cidade C\n"
+     << "  cidade <C>        - Lista o conteudo da cidade C\n"
      << "  caravana <N>      - Mostra a descricao da caravana N\n"
      //<< "  compra <N> <M>    - Compra M toneladas de mercadorias para a caravana N (na cidade)\n"
      //<< "  vende <N>         - Vende toda a mercadoria da caravana N (na cidade)\n"

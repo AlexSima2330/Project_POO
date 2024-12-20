@@ -80,13 +80,13 @@ void Map::addCity(char name, int row, int col) {
     grid[row][col] = name;  // Marca a posição da cidade no mapa com o seu nome
 }
 
-City* Map::getCityByName(char name) {
-    for (auto& city : cities) {
+City* Map::getCityByName(char name) const {
+    for (const auto& city : cities) {
         if (city.getName() == name) {
-            return &city;
+            return const_cast<City*>(&city); // Remove constness do ponteiro
         }
     }
-    return nullptr;  // Cidade não encontrada
+    return nullptr;
 }
 
 City* Map::getCityAt(int row, int col) {
@@ -111,5 +111,13 @@ char Map::getCell(int row, int col) const {
 // Setter para modificar o conteúdo de uma célula (usando coordenadas circulares)
 void Map::setCell(int row, int col, char value) {
     auto [wrappedRow, wrappedCol] = wrapCoordinates(row, col);
-    grid[wrappedRow][wrappedCol] = value; // Define diretamente o valor
+
+    // Não substitui células de cidades
+    if (std::islower(grid[wrappedRow][wrappedCol]) && value != grid[wrappedRow][wrappedCol]) {
+        return;
+    }
+
+    grid[wrappedRow][wrappedCol] = value;
 }
+
+

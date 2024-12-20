@@ -37,7 +37,7 @@ public:
 
     // Métodos para gerir cidades
     void addCity(char name, int row, int col);
-    City* getCityByName(char name);
+    City* getCityByName(char name) const;
     City* getCityAt(int row, int col);
     bool isCity(int row, int col) const;
 
