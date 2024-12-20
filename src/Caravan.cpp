@@ -114,3 +114,21 @@ void MilitaryCaravan::move(const std::string& direction) {
     cout << "[MilitaryCaravan] ID: " << id << " a mover-se para " << direction << "." << endl;
     Caravan::move(direction);
 }
+
+bool Caravan::addCargo(int quantity) {
+    if (cargo + quantity <= maxCargo) {
+        cargo += quantity;
+        return true; // Carga adicionada com sucesso
+    }
+    cout << "Erro: Carga excede a capacidade máxima da caravana." << endl;
+    return false; // Falha ao adicionar carga
+}
+
+bool Caravan::removeCargo(int quantity) {
+    if (quantity <= cargo) {
+        cargo -= quantity;
+        return true; // Carga removida com sucesso
+    }
+    cout << "Erro: Não é possível remover mais carga do que a atual." << endl;
+    return false; // Falha ao remover carga
+}

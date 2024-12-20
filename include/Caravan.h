@@ -98,6 +98,14 @@ public:
         return movesThisTurn < getMaxMovesPerTurn();
     }
 
+    int getCargo() const { return cargo; }
+    int getMaxCargo() const { return maxCargo; }
+    void setCargo(int newCargo) { cargo = newCargo; }
+
+    bool addCargo(int quantity); // Adiciona uma quantidade de carga, respeitando o limite máximo.
+    bool removeCargo(int quantity); // Remove uma quantidade de carga, sem permitir valores negativos.
+
+
     virtual int getMaxMovesPerTurn() const = 0;
 
     virtual ~Caravan() = default;

@@ -26,8 +26,8 @@ class City {
 
     // metodos de interaçao
     void listCaravans() const;
-    void sellGoods(Caravan* caravan, int quantity);
-    void buyGoods(Caravan* caravan, int quantity);
+    void sellGoods(Caravan* caravan, int quantity, int pricePerTon);
+    void buyGoods(Caravan* caravan, int quantity, int pricePerTon);
     void recruitCrew(Caravan* caravan, int quantity);
 };
 

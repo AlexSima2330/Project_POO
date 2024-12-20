@@ -35,19 +35,30 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         int caravanId;
         iss >> cmd >> caravanId;
         sim.showCaravanDetails(caravanId);
-    } else if (command.find("compra") == 0 && command.substr(0,6) == "compra ") {
+    } else if (command.rfind("compra ", 0) == 0) { // Verifica se começa com "compra "
         std::istringstream iss(command);
-        std::string cmd; iss >> cmd;
-        int caravanId, m;
-        iss >> caravanId >> m;
-        sim.buyMerchandise(caravanId, m);
-    } else if (command.find("vende") == 0) {
+        std::string cmd;
+        int caravanId, quantity;
+
+        iss >> cmd >> caravanId >> quantity; // Extrai o comando, o ID da caravana e a quantidade
+        if (!iss.fail() && !cmd.empty() && quantity > 0) {
+            sim.buyMerchandise(caravanId, quantity);
+        } else {
+            std::cout << "Erro: Formato inválido para o comando 'compra'. Use: compra <caravanId> <quantidade>" << std::endl;
+        }
+    } else if (command.rfind("vende ", 0) == 0) { // Verifica se começa com "vende "
         std::istringstream iss(command);
-        std::string cmd; iss >> cmd;
+        std::string cmd;
         int caravanId;
-        iss >> caravanId;
-        sim.sellMerchandise(caravanId);
-    } else if (command.find("move") == 0) {
+
+        iss >> cmd >> caravanId; // Extrai o comando e o ID da caravana
+        if (!iss.fail() && !cmd.empty()) {
+            sim.sellMerchandise(caravanId);
+        } else {
+            std::cout << "Erro: Formato inválido para o comando 'vende'. Use: vende <caravanId>" << std::endl;
+        }
+    }
+    else if (command.find("move") == 0) {
         std::istringstream iss(command);
         std::string cmd; iss >> cmd;
         int caravanId;

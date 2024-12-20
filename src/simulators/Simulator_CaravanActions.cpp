@@ -132,13 +132,50 @@ void Simulator::showCaravanDetails(int caravanId) const {
     std::cout << "Caravana com ID " << caravanId << " não encontrada." << std::endl;
 }
 
-void Simulator::buyMerchandise(int caravanId, int amount) {
-    cout << "Comprar " << amount << " de mercadoria para caravana " << caravanId << " (não implementado)." << endl;
+void Simulator::buyMerchandise(int caravanId, int quantity) {
+    for (auto& caravan : caravans) {
+        if (caravan->getId() == caravanId) {
+            if (!caravan->isInCity()) {
+                cout << "Erro: A caravana " << caravanId << " precisa estar numa cidade para comprar mercadorias." << endl;
+                return;
+            }
+
+            int cost = quantity; // Preço por tonelada é 1 moeda
+            if (wallet.getCoins() < cost) {
+                cout << "Erro: Moedas insuficientes para comprar " << quantity << " toneladas." << endl;
+                return;
+            }
+
+            if (caravan->addCargo(quantity)) {
+                wallet.addCoins(-cost);
+                cout << "Caravana " << caravanId << " comprou " << quantity
+                     << " toneladas de mercadoria. Moedas restantes: " << wallet.getCoins() << "." << endl;
+            }
+            return;
+        }
+    }
+    cout << "Erro: Caravana " << caravanId << " não encontrada." << endl;
 }
 
 void Simulator::sellMerchandise(int caravanId) {
-    cout << "Vender toda a mercadoria da caravana " << caravanId << " (não implementado)." << endl;
+    for (auto& caravan : caravans) {
+        if (caravan->getId() == caravanId) {
+            if (!caravan->isInCity()) {
+                cout << "Erro: A caravana " << caravanId << " precisa estar numa cidade para vender mercadorias." << endl;
+                return;
+            }
+
+            int revenue = caravan->getCargo() * 2; // Preço de venda por tonelada
+            caravan->setCargo(0); // Esvazia a carga
+            wallet.addCoins(revenue);
+            cout << "Caravana " << caravanId << " vendeu toda a mercadoria por " << revenue
+                 << " moedas. Moedas totais: " << wallet.getCoins() << "." << endl;
+            return;
+        }
+    }
+    cout << "Erro: Caravana " << caravanId << " não encontrada." << endl;
 }
+
 
 void Simulator::setCaravanAuto(int caravanId) {
     cout << "Caravana " << caravanId << " em modo auto (não implementado)." << endl;
