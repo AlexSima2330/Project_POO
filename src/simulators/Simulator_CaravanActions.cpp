@@ -89,7 +89,9 @@ void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direc
                 if (city) {
                     city->addCaravan(caravan);
                     caravan->setInCity(true);
-                    std::cout << "Caravana " << caravanId << " entrou na cidade " << city->getName() << "." << std::endl;
+                    caravan->refillWater();
+                    std::cout << "Caravana " << caravanId << " entrou na cidade " << city->getName()
+                              << " e foi reabastecida de água." << std::endl;
 
                     // A célula antiga é limpa, pois a caravana entrou na cidade
                     if (!map.isCity(oldRow, oldCol)) {
