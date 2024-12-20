@@ -64,9 +64,14 @@ void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direc
             caravan->move(direction);
             auto [newRow, newCol] = map.wrapCoordinates(caravan->getRow(), caravan->getCol());
 
-            // Atualiza a célula antiga (limpa a caravana se não for uma cidade)
-            if (!map.isCity(oldRow, oldCol)) {
-                map.setCell(oldRow, oldCol, '.');
+            // Verifica se o destino é um obstáculo
+            char destinationCell = map.getCell(newRow, newCol);
+            if (destinationCell == '+') {
+                std::cout << "[Erro] Movimento inválido: destino contém um obstáculo." << std::endl;
+
+                // Restaura a posição anterior da caravana
+                caravan->setPosition(oldRow, oldCol);
+                return;
             }
 
             // Verifica se o destino é uma cidade
@@ -76,8 +81,20 @@ void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direc
                     city->addCaravan(caravan);
                     caravan->setInCity(true);
                     std::cout << "Caravana " << caravanId << " entrou na cidade " << city->getName() << "." << std::endl;
-                    return; // Não altera o mapa visual, a caravana está "dentro" da cidade
+
+                    // A célula antiga é limpa, pois a caravana entrou na cidade
+                    if (!map.isCity(oldRow, oldCol)) {
+                        map.setCell(oldRow, oldCol, '.');
+                    }
+
+                    return; // Não adiciona a caravana no mapa visual
                 }
+            }
+
+            // Atualiza o mapa
+            // Limpa a célula antiga se não for uma cidade
+            if (!map.isCity(oldRow, oldCol)) {
+                map.setCell(oldRow, oldCol, '.');
             }
 
             // Atualiza a nova posição com o ID da caravana
