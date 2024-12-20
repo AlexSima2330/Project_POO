@@ -74,6 +74,15 @@ void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direc
                 return;
             }
 
+            // Verifica se o destino já contém uma caravana
+            if (std::isdigit(destinationCell)) {
+                std::cout << "[Erro] Movimento inválido: destino já contém outra caravana." << std::endl;
+
+                // Restaura a posição anterior da caravana
+                caravan->setPosition(oldRow, oldCol);
+                return;
+            }
+
             // Verifica se o destino é uma cidade
             if (map.isCity(newRow, newCol)) {
                 City* city = map.getCityAt(newRow, newCol);

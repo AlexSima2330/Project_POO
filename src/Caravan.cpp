@@ -37,7 +37,6 @@ void Caravan::move(const std::string& direction) {
     }
 }
 
-
 // Processa consumo de água e inatividade
 bool Caravan::processMovement(Map& map) {
     int waterConsumption = consumeWater(); // Consumo de água específico da subclasse
