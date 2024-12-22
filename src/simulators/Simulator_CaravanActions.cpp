@@ -1,6 +1,7 @@
 #include "Simulator.h"
 #include "BarbarianCaravan.h"
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -173,17 +174,112 @@ void Simulator::sellMerchandise(int caravanId) {
             return;
         }
     }
-    cout << "Erro: Caravana " << caravanId << " não encontrada." << endl;
+    cout << "Erro: Caravana " << caravanId << " nao encontrada." << endl;
 }
 
 
 void Simulator::setCaravanAuto(int caravanId) {
-    cout << "Caravana " << caravanId << " em modo auto (não implementado)." << endl;
+    for (auto& caravan : caravans) {
+        if (caravan->getId() == caravanId) {
+            caravan->setAuto(true);
+            std::cout << "Caravana " << caravanId << " está agora em modo automático." << std::endl;
+
+            // Processa imediatamente o movimento automático
+            advanceSimulation(1);
+            return;
+        }
+    }
+    std::cout << "Erro: Caravana com ID " << caravanId << " não encontrada." << std::endl;
+}
+
+
+void Simulator::handleTradeCaravanAuto(Caravan* caravan) {
+    // Exemplo: Se estiver próximo de outra caravana ou item
+    int row = caravan->getRow();
+    int col = caravan->getCol();
+
+    // Buscar caravanas amigas ou itens próximos
+    for (auto& otherCaravan : caravans) {
+        if (otherCaravan != caravan && abs(otherCaravan->getRow() - row) <= 2 &&
+            abs(otherCaravan->getCol() - col) <= 2) {
+            // Tenta mover para uma posição adjacente amigável
+            std::cout << "Caravana de Comercio " << caravan->getId()
+                      << " movendo-se para proteçao ou pegar itens." << std::endl;
+            return;
+            }
+    }
+}
+void Simulator::handleMilitaryCaravanAuto(Caravan* caravan) {
+    // Coordenadas da caravana militar
+    int caravanRow = caravan->getRow();
+    int caravanCol = caravan->getCol();
+
+    for (auto& otherCaravan : caravans) {
+        if (otherCaravan->getType() == "Barbarian") {
+            int barbarianRow = otherCaravan->getRow();
+            int barbarianCol = otherCaravan->getCol();
+
+            // Verifica se está dentro de 6 posições
+            if (abs(barbarianRow - caravanRow) <= 6 && abs(barbarianCol - caravanCol) <= 6) {
+                std::cout << "[DEBUG] Caravana Militar " << caravan->getId()
+                          << " encontrou um bárbaro na posição (" << barbarianRow << ", " << barbarianCol << ")."
+                          << std::endl;
+
+                // Movimento em direção ao bárbaro
+                if (barbarianRow > caravanRow) {
+                    caravan->move("B"); // Para baixo
+                } else if (barbarianRow < caravanRow) {
+                    caravan->move("C"); // Para cima
+                }
+
+                if (barbarianCol > caravanCol) {
+                    caravan->move("D"); // Para a direita
+                } else if (barbarianCol < caravanCol) {
+                    caravan->move("E"); // Para a esquerda
+                }
+
+                return; // Sai após mover-se
+            }
+        }
+    }
+
+    std::cout << "Caravana Militar " << caravan->getId() << " não encontrou bárbaros próximos." << std::endl;
+}
+
+
+
+void Simulator::handleCaravanWithoutCrew(Caravan* caravan) {
+    caravan->incrementAutoTurnsWithoutCrew();
+
+    if (caravan->getAutoTurnsWithoutCrew() > (caravan->getType() == "Trade" ? 5 : 7)) {
+        std::cout << "Caravana " << caravan->getId() << " desapareceu por falta de tripulantes." << std::endl;
+        removeCaravan(caravan);
+        return;
+    }
+
+    // Movimento baseado no tipo
+    if (caravan->getType() == "Trade") {
+        std::cout << "Caravana de Comércio " << caravan->getId()
+                  << " movendo-se de forma aleatória sem tripulaçao." << std::endl;
+        caravan->move("random"); // Implementar movimento aleatório
+    } else if (caravan->getType() == "Military") {
+        std::cout << "Caravana Militar " << caravan->getId()
+                  << " movendo-se na ultima direçao conhecida." << std::endl;
+        caravan->move("last_direction"); // Implementar lógica de última direção
+    }
 }
 
 void Simulator::stopCaravanAuto(int caravanId) {
-    cout << "Caravana " << caravanId << " parou modo auto (não implementado)." << endl;
+    for (auto& caravan : caravans) {
+        if (caravan->getId() == caravanId) {
+            caravan->setAuto(false);
+            std::cout << "Caravana " << caravanId << " parou o modo automatico." << std::endl;
+            return;
+        }
+    }
+    std::cout << "Erro: Caravana com ID " << caravanId << " não encontrada." << std::endl;
 }
+
 
 void Simulator::createBarbarianCaravan(int l, int c) {
     // Verifica se a posição é válida e desocupada
@@ -192,13 +288,75 @@ void Simulator::createBarbarianCaravan(int l, int c) {
         barbarian->setPosition(l, c);
         caravans.push_back(barbarian); // Adiciona à lista de caravanas
         map.setCell(l, c, '!'); // Marca no mapa com o símbolo de caravana bárbara
-        cout << "Caravana bárbara criada na posição (" << l << ", " << c << ")." << endl;
+        cout << "Caravana barbara criada na posiçao (" << l << ", " << c << ")." << endl;
     } else {
-        cerr << "Erro: Não é possível criar uma caravana bárbara em (" << l << ", " << c << "). Posição inválida ou ocupada." << endl;
+        cerr << "Erro: Não e possível criar uma caravana barbara em (" << l << ", " << c << "). Posição inválida ou ocupada." << endl;
+    }
+}
+
+void Simulator::buyCrewForCaravan(int caravanId, int crewCount) {
+    for (auto& caravan : caravans) {
+        if (caravan->getId() == caravanId) {
+            // Verificar se a caravana está em uma cidade
+            if (!caravan->isInCity()) {
+                std::cout << "Erro: A caravana " << caravanId << " precisa estar em uma cidade para comprar tripulantes." << std::endl;
+                return;
+            }
+
+            // Calcular o custo
+            int cost = crewCount; // Assumindo 1 moeda por tripulante
+            if (wallet.getCoins() < cost) {
+                std::cout << "Erro: Moedas insuficientes para comprar " << crewCount << " tripulantes." << std::endl;
+                return;
+            }
+
+            // Adicionar os tripulantes à caravana
+            caravan->setCrew(caravan->getCrew() + crewCount);
+            wallet.deductCoins(cost);
+
+            std::cout << "Caravana " << caravanId << " comprou " << crewCount
+                      << " tripulantes. Moedas restantes: " << wallet.getCoins() << "." << std::endl;
+            return;
+        }
+    }
+
+    std::cout << "Erro: Caravana com ID " << caravanId << " não encontrada." << std::endl;
+}
+
+void Simulator::removeCaravan(Caravan* caravan) {
+    auto it = find(caravans.begin(), caravans.end(), caravan);
+    if (it != caravans.end()) {
+        map.setCell(caravan->getRow(), caravan->getCol(), '.'); // Limpa a posição no mapa
+        delete *it; // Libera memória
+        caravans.erase(it);
     }
 }
 
 
-void Simulator::addCrewToCaravan(int caravanId, int t) {
-    cout << "Adicionar " << t << " tripulantes à caravana " << caravanId << " (não implementado)." << endl;
+void Simulator::handleTradeCaravanInSandstorm(TradeCaravan* caravan) {
+    int chance = rand() % 100;
+    bool isOverloaded = (caravan->getCargo() > (caravan->getMaxCargo() / 2));
+    int destructionChance = isOverloaded ? 50 : 25;
+
+    if (chance < destructionChance) {
+        std::cout << "[Tempestade] Caravana de Comercio ID: " << caravan->getId() << " foi destruída!" << std::endl;
+        removeCaravan(caravan); // Implementar lógica de remoção
+    } else {
+        caravan->setCargo(caravan->getCargo() * 0.75); // Perde 25% da carga
+        std::cout << "[Tempestade] Caravana de Comercio ID: " << caravan->getId()
+                  << " sobreviveu, mas perdeu 25% da carga." << std::endl;
+    }
+}
+
+void Simulator::handleMilitaryCaravanInSandstorm(MilitaryCaravan* caravan) {
+    caravan->loseCrew(caravan->getCrew() * 0.10); // Perde 10% dos tripulantes
+
+    int chance = rand() % 100;
+    if (chance < 33) {
+        std::cout << "[Tempestade] Caravana Militar ID: " << caravan->getId() << " foi destruída!" << std::endl;
+        removeCaravan(caravan); // Implementar lógica de remoção
+    } else {
+        std::cout << "[Tempestade] Caravana Militar ID: " << caravan->getId()
+                  << " perdeu 10% dos tripulantes, mas sobreviveu." << std::endl;
+    }
 }

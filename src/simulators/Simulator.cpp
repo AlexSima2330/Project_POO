@@ -77,12 +77,12 @@ void Simulator::run() {
      << "  compra <N> <M>    - Compra M toneladas de mercadorias para a caravana N (na cidade)\n"
      << "  vende <N>         - Vende toda a mercadoria da caravana N (na cidade)\n"
      << "  move <N> <X>      - Move a caravana N na direcao X (D, E, C, B, CE, CD, BE, BD)\n"
-     //<< "  auto <N>          - Coloca a caravana N em modo auto-gestao\n"
-     //<< "  stop <N>          - Para o modo auto da caravana N\n"
+     << "  auto <N>          - Coloca a caravana N em modo auto-gestao\n"
+     << "  stop <N>          - Para o modo auto da caravana N\n"
      << "  barbaro <l> <c>   - Cria uma caravana barbara em (l, c)\n"
-     //<< "  areia <l> <c> <r> - Cria uma tempestade de areia em (l,c) com raio r\n"
+     << "  areia <l> <c> <r> - Cria uma tempestade de areia em (l,c) com raio r\n"
      << "  moedas <N>        - Acrescenta N moedas ao jogador (pode ser negativo)\n"
-     //<< "  tripul <N> <T>    - Adiciona T tripulantes a caravana N (na cidade)\n"
+     << "  tripul <N> <T>    - Adiciona T tripulantes a caravana N (na cidade)\n"
      //<< "  saves <nome>      - Guarda o estado atual do buffer com o nome dado\n"
     // << "  loads <nome>      - Carrega um estado anteriormente guardado\n"
     // << "  lists             - Lista os nomes dos estados guardados\n"
@@ -127,18 +127,40 @@ void Simulator::run() {
         }
     }
 }
+void Simulator::showCaravanStatus()  {
+    std::cout << "Status das Caravanas no instante atual:" << std::endl;
+    for (const auto& caravan : caravans) {
+        caravan->status();
+    }
+}
 
 void Simulator::advanceSimulation(int n) {
     for (int i = 0; i < n; ++i) {
-        // Reseta movimentos de todas as caravanas
-        for (auto caravan : caravans) {
-            caravan->resetMoves();
+        std::cout << "Simulação avançando instante " << (i + 1) << " de " << n << "." << std::endl;
+
+        for (auto& caravan : caravans) {
+            if (caravan->isAuto()) {
+                if (caravan->isActive()) {
+                    if (caravan->getType() == "Trade") {
+                        handleTradeCaravanAuto(caravan);
+                    } else if (caravan->getType() == "Military") {
+                        handleMilitaryCaravanAuto(caravan);
+                    }
+                } else {
+                    handleCaravanWithoutCrew(caravan);
+                }
+            }
         }
 
-        // Processa comportamentos automáticos (se existirem)
-        std::cout << "Avançou " << (i + 1) << " instante(s)." << std::endl;
+        // Atualiza o mapa e exibe o estado
+        displayMap();
+
+        // Exibe informações adicionais, como estado das caravanas
+        showCaravanStatus();
     }
 }
+
+
 
 void Simulator::showPrices() const {
     cout << "Preços das mercadorias (não implementado)." << endl;

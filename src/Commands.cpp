@@ -13,8 +13,11 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         int n = 1; // Valor padrão de 1 instante
         iss >> cmd >> n;
 
-        if (n <= 0) n = 1; // Garantir que o valor seja válido
-        sim.advanceSimulation(n);
+        if (n <= 0) {
+            std::cout << "Erro: O número de instantes deve ser maior que 0." << std::endl;
+        } else {
+            sim.advanceSimulation(n);
+        }
     } else if (command.find("comprac") == 0) {
         std::istringstream iss(command);
         std::string cmd; iss >> cmd;
@@ -67,13 +70,15 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         sim.moveCaravanWithDirection(caravanId, direction);
     } else if (command.find("auto") == 0 && command.substr(0,5) == "auto ") {
         std::istringstream iss(command);
-        std::string cmd; iss >> cmd;
-        int caravanId; iss >> caravanId;
+        std::string cmd;
+        int caravanId;
+        iss >> cmd >> caravanId;
         sim.setCaravanAuto(caravanId);
     } else if (command.find("stop") == 0) {
         std::istringstream iss(command);
-        std::string cmd; iss >> cmd;
-        int caravanId; iss >> caravanId;
+        std::string cmd;
+        int caravanId;
+        iss >> cmd >> caravanId;
         sim.stopCaravanAuto(caravanId);
     } else if (command.find("barbaro") == 0) {
         std::istringstream iss(command);
@@ -85,7 +90,11 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         std::string cmd; iss >> cmd;
         int l, c, r;
         iss >> l >> c >> r;
-        sim.createSandstorm(l, c, r);
+        if (!iss.fail()) {
+            sim.createSandstorm(l, c, r);
+        } else {
+            std::cout << "Erro: Comando 'areia' inválido. Uso: areia <linha> <coluna> <raio>" << std::endl;
+        }
     } else if (command.find("moedas") == 0) {
         std::istringstream iss(command);
         std::string cmd; iss >> cmd;
@@ -93,11 +102,17 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         sim.addCoins(n);
     } else if (command.find("tripul") == 0) {
         std::istringstream iss(command);
-        std::string cmd; iss >> cmd;
-        int caravanId, t;
-        iss >> caravanId >> t;
-        sim.addCrewToCaravan(caravanId, t);
-    } else if (command.find("saves") == 0) {
+        std::string cmd;
+        int caravanId, crewCount;
+        iss >> cmd >> caravanId >> crewCount;
+
+        if (!iss.fail() && crewCount > 0) {
+            sim.buyCrewForCaravan(caravanId, crewCount);
+        } else {
+            std::cout << "Erro: Formato inválido para o comando 'tripul'. Uso: tripul <caravanId> <quantidade>" << std::endl;
+        }
+    }
+    else if (command.find("saves") == 0) {
         std::istringstream iss(command);
         std::string cmd, nome; iss >> cmd >> nome;
         sim.saveBufferState(nome);

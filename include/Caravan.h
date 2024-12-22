@@ -19,6 +19,10 @@ protected:
     bool onCharger = false;
     bool inCity = false;
     int movesThisTurn;
+    bool isAutoManaged = false; // Indica se a caravana está em modo automático
+    int autoTurnsWithoutCrew = 0; // Contador para caravana sem tripulantes
+
+
 
 public:
     // Construtor
@@ -28,6 +32,7 @@ public:
     int getId() const { return id; }
     int getRow() const { return row; }
     int getCol() const { return col; }
+    std::string getType() const { return type; }
     void setPosition(int newRow, int newCol);
 
     // Movimento
@@ -74,6 +79,9 @@ public:
     int getCrew() const {
         return crew;
     }
+    void setCrew(int newCrew) {
+        crew = std::max(0, newCrew); // Garante que o número de tripulantes nunca seja negativo
+    }
 
     bool wasOnCharger() const {
         return onCharger;
@@ -108,7 +116,15 @@ public:
 
     virtual int getMaxMovesPerTurn() const = 0;
 
+    bool isAuto() const { return isAutoManaged; }
+    void setAuto(bool autoState) { isAutoManaged = autoState; }
+    void incrementAutoTurnsWithoutCrew() { autoTurnsWithoutCrew++; }
+    void resetAutoTurnsWithoutCrew() { autoTurnsWithoutCrew = 0; }
+    int getAutoTurnsWithoutCrew() const { return autoTurnsWithoutCrew; }
+
     virtual ~Caravan() = default;
+
+
 
 };
 

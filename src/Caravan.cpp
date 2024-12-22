@@ -15,6 +15,8 @@ void Caravan::setPosition(int newRow, int newCol) {
 
 // Movimento baseado na direção
 void Caravan::move(const std::string& direction) {
+    int oldRow = row;
+    int oldCol = col;
     // Movimento baseado na direção
     if (direction == "D") {
         ++col;
@@ -35,6 +37,9 @@ void Caravan::move(const std::string& direction) {
     } else {
         std::cout << "Direção inválida: " << direction << std::endl;
     }
+    std::cout << "Caravana " << id << " moveu-se de (" << oldRow << ", " << oldCol
+             << ") para (" << row << ", " << col << ")." << std::endl;
+
 }
 
 // Processa consumo de água e inatividade
@@ -72,7 +77,8 @@ TradeCaravan::TradeCaravan(int id, int initialCrew)
     maxCargo = 5;       // Capacidade máxima de carga para TradeCaravan
     maxWater = 400;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
-    crew = initialCrew;  // Número inicial de tripulantes
+    crew = initialCrew;
+    cargo = 2;// Número inicial de tripulantes
 }
 
 int TradeCaravan::consumeWater() const {
@@ -98,7 +104,8 @@ MilitaryCaravan::MilitaryCaravan(int id, int initialCrew)
     maxCargo = 5;        // Capacidade máxima de carga para MilitaryCaravan
     maxWater = 400;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
-    crew = initialCrew;  // Número inicial de tripulantes
+    crew = initialCrew;
+    cargo = 3;// Número inicial de tripulantes
 }
 
 int MilitaryCaravan::consumeWater() const {

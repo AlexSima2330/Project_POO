@@ -82,5 +82,28 @@ void Simulator::listCityCaravans(char cityName) const {
 
 
 void Simulator::createSandstorm(int l, int c, int r) {
-    cout << "Criar tempestade de areia em (" << l << "," << c << ") com raio " << r << " (não implementado)." << endl;
+    std::cout << "Criando tempestade de areia em (" << l << "," << c << ") com raio " << r << "." << std::endl;
+
+    for (auto& caravan : caravans) {
+        int caravanRow = caravan->getRow();
+        int caravanCol = caravan->getCol();
+
+        // Verificar se a caravana está dentro do raio da tempestade
+        if (caravanRow >= l - r && caravanRow <= l + r &&
+            caravanCol >= c - r && caravanCol <= c + r) {
+
+            // Processar comportamento dependendo do tipo de caravana
+            if (caravan->getType() == "Trade") {
+                TradeCaravan* tradeCaravan = dynamic_cast<TradeCaravan*>(caravan);
+                if (tradeCaravan) {
+                    handleTradeCaravanInSandstorm(tradeCaravan);
+                }
+            } else if (caravan->getType() == "Military") {
+                MilitaryCaravan* militaryCaravan = dynamic_cast<MilitaryCaravan*>(caravan);
+                if (militaryCaravan) {
+                    handleMilitaryCaravanInSandstorm(militaryCaravan);
+                }
+            }
+            }
+    }
 }
