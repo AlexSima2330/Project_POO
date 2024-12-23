@@ -72,7 +72,12 @@ void Simulator::displayMap() {
 
 // Métodos pedidos da fase 2 ligados ao mapa/ambiente
 void Simulator::listCityCaravans(char cityName) const {
-    cout << "Listar caravanas da cidade " << cityName << " (não implementado)." << endl;
+    City* city = map.getCityByName(cityName);
+    if (city) {
+        city->listCaravans();
+    } else {
+        std::cout << "Cidade " << cityName << " não encontrada." << std::endl;
+    }
 }
 
 void Simulator::createSandstorm(int l, int c, int r) {

@@ -15,6 +15,8 @@ void Caravan::setPosition(int newRow, int newCol) {
 
 // Movimento baseado na direção
 void Caravan::move(const std::string& direction) {
+    int oldRow = row;
+    int oldCol = col;
     // Movimento baseado na direção
     if (direction == "D") {
         ++col;
@@ -73,7 +75,8 @@ TradeCaravan::TradeCaravan(int id, int initialCrew)
     maxCargo = 5;       // Capacidade máxima de carga para TradeCaravan
     maxWater = 400;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
-    crew = initialCrew;  // Número inicial de tripulantes
+    crew = initialCrew;
+    cargo = 2;// Número inicial de tripulantes
 }
 
 int TradeCaravan::consumeWater() const {
@@ -99,7 +102,8 @@ MilitaryCaravan::MilitaryCaravan(int id, int initialCrew)
     maxCargo = 5;        // Capacidade máxima de carga para MilitaryCaravan
     maxWater = 400;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
-    crew = initialCrew;  // Número inicial de tripulantes
+    crew = initialCrew;
+    cargo = 3;// Número inicial de tripulantes
 }
 
 int MilitaryCaravan::consumeWater() const {
@@ -114,6 +118,24 @@ int MilitaryCaravan::consumeWater() const {
 void MilitaryCaravan::move(const std::string& direction) {
     cout << "[MilitaryCaravan] ID: " << id << " a mover-se para " << direction << "." << endl;
     Caravan::move(direction);
+}
+
+bool Caravan::addCargo(int quantity) {
+    if (cargo + quantity <= maxCargo) {
+        cargo += quantity;
+        return true; // Carga adicionada com sucesso
+    }
+    cout << "Erro: Carga excede a capacidade máxima da caravana." << endl;
+    return false; // Falha ao adicionar carga
+}
+
+bool Caravan::removeCargo(int quantity) {
+    if (quantity <= cargo) {
+        cargo -= quantity;
+        return true; // Carga removida com sucesso
+    }
+    cout << "Erro: Não é possível remover mais carga do que a atual." << endl;
+    return false; // Falha ao remover carga
 }
 
 void Caravan::becomeObstacle(Map &map) {

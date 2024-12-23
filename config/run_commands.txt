@@ -1,0 +1,4 @@
+move 1 D
+move 1 D
+cidade a
+prox 1

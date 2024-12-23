@@ -35,8 +35,8 @@ void Simulator::run() {
 
                         // Adicionar caravanas aqui, após o mapa ser carregado
                         Caravan* trade = new TradeCaravan(1, 20);
-                        trade->setPosition(2, 9);
-                        addCaravan(trade, 2, 9);
+                        trade->setPosition(2, 7);
+                        addCaravan(trade, 2, 7);
                         //trade->setWater(10);
 
                         Caravan* military = new MilitaryCaravan(2, 40);
@@ -68,21 +68,21 @@ void Simulator::run() {
 
             cout << "Digite um comando ou 'terminar' para voltar a fase 1.\n"
      << "Comandos disponiveis na fase 2:\n"
-     //<< "  exec <ficheiro>   - Executa comandos a partir de um ficheiro\n"
+     << "  exec <ficheiro>   - Executa comandos a partir de um ficheiro\n"
      << "  prox <n>          - Avanca a simulacao n instantes\n"
      //<< "  comprac <C> <T>   - Compra uma caravana do tipo T na cidade C\n"
-     //<< "  precos            - Lista os precos das mercadorias\n"
-     //<< "  cidade <C>        - Lista o conteudo da cidade C\n"
+     << "  precos            - Lista os precos das mercadorias\n"
+     << "  cidade <C>        - Lista o conteudo da cidade C\n"
      << "  caravana <N>      - Mostra a descricao da caravana N\n"
-     //<< "  compra <N> <M>    - Compra M toneladas de mercadorias para a caravana N (na cidade)\n"
-     //<< "  vende <N>         - Vende toda a mercadoria da caravana N (na cidade)\n"
+     << "  compra <N> <M>    - Compra M toneladas de mercadorias para a caravana N (na cidade)\n"
+     << "  vende <N>         - Vende toda a mercadoria da caravana N (na cidade)\n"
      << "  move <N> <X>      - Move a caravana N na direcao X (D, E, C, B, CE, CD, BE, BD)\n"
-     //<< "  auto <N>          - Coloca a caravana N em modo auto-gestao\n"
-     //<< "  stop <N>          - Para o modo auto da caravana N\n"
+     << "  auto <N>          - Coloca a caravana N em modo auto-gestao\n"
+     << "  stop <N>          - Para o modo auto da caravana N\n"
      << "  barbaro <l> <c>   - Cria uma caravana barbara em (l, c)\n"
-     //<< "  areia <l> <c> <r> - Cria uma tempestade de areia em (l,c) com raio r\n"
+     << "  areia <l> <c> <r> - Cria uma tempestade de areia em (l,c) com raio r\n"
      << "  moedas <N>        - Acrescenta N moedas ao jogador (pode ser negativo)\n"
-     //<< "  tripul <N> <T>    - Adiciona T tripulantes a caravana N (na cidade)\n"
+     << "  tripul <N> <T>    - Adiciona T tripulantes a caravana N (na cidade)\n"
      //<< "  saves <nome>      - Guarda o estado atual do buffer com o nome dado\n"
     // << "  loads <nome>      - Carrega um estado anteriormente guardado\n"
     // << "  lists             - Lista os nomes dos estados guardados\n"
@@ -94,24 +94,29 @@ void Simulator::run() {
             }
 
             if (command.find("exec") == 0) {
-                istringstream iss(command);
-                string cmd, filename;
+                std::istringstream iss(command);
+                std::string cmd, filename;
                 iss >> cmd >> filename;
 
-                if (!filename.empty()) {
-                    ifstream file(filename);
-                    if (!file.is_open()) {
-                        cerr << "Não foi possivel abrir o ficheiro: " << filename << endl;
-                    } else {
-                        string line;
-                        while (getline(file, line)) {
-                            processPhase2Command(*this, line);
-                        }
-                    }
-                } else {
-                    cerr << "Uso incorreto: exec <nomeFicheiro>" << endl;
+                if (filename.empty()) {
+                    filename = "run_commands.txt"; // Nome padrão
                 }
-            } else if (command == "terminar") {
+
+                // Caminho do ficheiro na pasta "config"
+                std::string filepath = "./config/" + filename;
+
+                ifstream file(filepath);
+                if (!file.is_open()) {
+                    cerr << "Não foi possível abrir o ficheiro: " << filepath << endl;
+                } else {
+                    std::cout << "A executar comandos do ficheiro: " << filepath << std::endl;
+                    string line;
+                    while (getline(file, line)) {
+                        processPhase2Command(*this, line); // Executa cada comando do ficheiro
+                    }
+                }
+            }
+            else if (command == "terminar") {
                 cout << "A simulacao terminou. Voltando a fase 1..." << endl;
                 // Aqui não faz return, nem break do programa inteiro,
                 // Apenas break do loop da fase 2, voltando ao loop externo do run()
@@ -122,21 +127,43 @@ void Simulator::run() {
         }
     }
 }
+void Simulator::showCaravanStatus()  {
+    std::cout << "Status das Caravanas no instante atual:" << std::endl;
+    for (const auto& caravan : caravans) {
+        caravan->status();
+    }
+}
 
 void Simulator::advanceSimulation(int n) {
     for (int i = 0; i < n; ++i) {
-        // Reseta movimentos de todas as caravanas
-        for (auto caravan : caravans) {
-            caravan->resetMoves();
+        std::cout << "Simulação avançando instante " << (i + 1) << " de " << n << "." << std::endl;
+
+        for (auto& caravan : caravans) {
+            if (caravan->isAuto()) {
+                if (caravan->isActive()) {
+                    if (caravan->getType() == "Trade") {
+                        handleTradeCaravanAuto(caravan);
+                    } else if (caravan->getType() == "Military") {
+                        handleMilitaryCaravanAuto(caravan);
+                    }
+                } else {
+                    handleCaravanWithoutCrew(caravan);
+                }
+            }
         }
 
-        // Processa comportamentos automáticos (se existirem)
-        std::cout << "Avançou " << (i + 1) << " instante(s)." << std::endl;
+        // Atualiza o mapa e exibe o estado
+        displayMap();
+
+        // Exibe informações adicionais, como estado das caravanas
+        showCaravanStatus();
     }
 }
 
 void Simulator::showPrices() const {
-    cout << "Preços das mercadorias (não implementado)." << endl;
+    cout << "Precos das mercadorias nas cidades (T):" << endl;
+    cout << " - Preco de compra: 1 moeda por tonelada" << endl;
+    cout << " - Preco de venda: 2 moedas por tonelada" << endl;
 }
 
 void Simulator::addCoins(int n) {

@@ -28,6 +28,7 @@ public:
 
     // Métodos de caravanas
     void addCaravan(Caravan* caravan, int row, int col);
+    void removeCaravan(Caravan* caravan);
     bool moveCaravan(int caravanId, char direction);
     void showCaravanStatus() const;
 
@@ -35,12 +36,17 @@ public:
 
     // Geral (podes deixar no Simulator.cpp)
     void advanceSimulation(int n);
+    void showCaravanStatus();
     void showPrices() const;
     void addCoins(int n);
 
     // Map/ambiente (Simulator_MapActions.cpp)
     void listCityCaravans(char cityName) const;
     void createSandstorm(int l, int c, int r);
+
+    void handleTradeCaravanInSandstorm(TradeCaravan* caravan);
+    void handleMilitaryCaravanInSandstorm(MilitaryCaravan* caravan);
+
 
     // Caravanas (Simulator_CaravanActions.cpp)
     void buyCaravan(char cityName, char tipo);
@@ -49,9 +55,13 @@ public:
     void sellMerchandise(int caravanId);
     void moveCaravanWithDirection(int caravanId, const std::string &direction);
     void setCaravanAuto(int caravanId);
+    void handleTradeCaravanAuto(Caravan* caravan);
+    void handleMilitaryCaravanAuto(Caravan* caravan);
+    void handleCaravanWithoutCrew(Caravan* caravan);
     void stopCaravanAuto(int caravanId);
     void createBarbarianCaravan(int l, int c);
-    void addCrewToCaravan(int caravanId, int t);
+    void buyCrewForCaravan(int caravanId, int crewCount);
+
 
     // Storage (Simulator_Storage.cpp)
     void saveBufferState(const std::string &nome);

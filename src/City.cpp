@@ -26,16 +26,28 @@ void City::listCaravans() const {
     }
 }
 
-// Vender mercadorias a uma caravana
-void City::sellGoods(Caravan* caravan, int quantity) {
-    // Lógica para vender mercadorias, verifica capacidade da caravana
-    // (Implementar com base na classe Caravan)
+void City::sellGoods(Caravan* caravan, int quantity, int pricePerTon) {
+    if (caravan->getCargo() < quantity) {
+        std::cout << "Erro: Caravana ID " << caravan->getId() << " não tem mercadoria suficiente para vender." << std::endl;
+        return;
+    }
+
+    caravan->setCargo(caravan->getCargo() - quantity);
+    std::cout << "Caravana ID " << caravan->getId() << " vendeu " << quantity
+              << " toneladas de mercadoria por " << (quantity * pricePerTon) << " moedas." << std::endl;
 }
 
-// Comprar mercadorias de uma caravana
-void City::buyGoods(Caravan* caravan, int quantity) {
-    // Lógica para comprar mercadorias
+void City::buyGoods(Caravan* caravan, int quantity, int pricePerTon) {
+    if (caravan->getMaxCargo() - caravan->getCargo() < quantity) {
+        std::cout << "Erro: Caravana ID " << caravan->getId() << " não tem espaço suficiente para mais mercadoria." << std::endl;
+        return;
+    }
+
+    caravan->setCargo(caravan->getCargo() + quantity);
+    std::cout << "Caravana ID " << caravan->getId() << " comprou " << quantity
+              << " toneladas de mercadoria por " << (quantity * pricePerTon) << " moedas." << std::endl;
 }
+
 
 // Recrutar tripulantes para uma caravana
 void City::recruitCrew(Caravan* caravan, int quantity) {
