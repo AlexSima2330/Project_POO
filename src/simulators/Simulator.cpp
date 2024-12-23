@@ -69,7 +69,7 @@ void Simulator::run() {
             cout << "Digite um comando ou 'terminar' para voltar a fase 1.\n"
      << "Comandos disponiveis na fase 2:\n"
      << "  exec <ficheiro>   - Executa comandos a partir de um ficheiro\n"
-     //<< "  prox <n>          - Avanca a simulacao n instantes\n"
+     << "  prox <n>          - Avanca a simulacao n instantes\n"
      << "  comprac <C> <T>   - Compra uma caravana do tipo T na cidade C\n"
      //<< "  precos            - Lista os precos das mercadorias\n"
      << "  cidade <C>        - Lista o conteudo da cidade C\n"
@@ -134,32 +134,89 @@ void Simulator::showCaravanStatus()  {
     }
 }
 
+void Simulator::engageCombat(Caravan* military, Caravan* barbarian) {
+    int militaryScore = rand() % (military->getCrew() + 1);
+    int barbarianScore = rand() % (barbarian->getCrew() + 1);
+
+    if (militaryScore > barbarianScore) {
+        int lossBarbarian = 2 * militaryScore;
+        int lossMilitary = military->getCrew() / 5;
+        barbarian->loseCrew(lossBarbarian);
+        military->loseCrew(lossMilitary);
+
+        if (!barbarian->isActive()) {
+            std::cout << "Caravana Bárbara ID: " << barbarian->getId() << " foi destruída." << std::endl;
+            military->setWater(std::min(military->getWater() + barbarian->getWater(), military->getMaxWater()));
+            removeCaravan(barbarian);
+        }
+    } else if (militaryScore < barbarianScore) {
+        int lossMilitary = 2 * barbarianScore;
+        int lossBarbarian = barbarian->getCrew() / 5;
+        military->loseCrew(lossMilitary);
+        barbarian->loseCrew(lossBarbarian);
+
+        if (!military->isActive()) {
+            std::cout << "Caravana Militar ID: " << military->getId() << " foi destruída." << std::endl;
+            barbarian->setWater(std::min(barbarian->getWater() + military->getWater(), barbarian->getMaxWater()));
+            removeCaravan(military);
+        }
+    } else {
+        std::cout << "Combate empatado entre Caravana Militar ID: " << military->getId()
+                  << " e Caravana Bárbara ID: " << barbarian->getId() << "." << std::endl;
+    }
+}
+void Simulator::processCombats() {
+    for (size_t i = 0; i < caravans.size(); ++i) {
+        for (size_t j = i + 1; j < caravans.size(); ++j) {
+            Caravan* c1 = caravans[i];
+            Caravan* c2 = caravans[j];
+
+            if (areAdjacent(c1->getRow(), c1->getCol(), c2->getRow(), c2->getCol())) {
+                if ((c1->getType() == "Military" && c2->getType() == "Barbarian") ||
+                    (c1->getType() == "Barbarian" && c2->getType() == "Military")) {
+                    std::cout << "Iniciando combate entre Caravana Militar ID: "
+                              << (c1->getType() == "Military" ? c1->getId() : c2->getId())
+                              << " e Caravana Barbara ID: "
+                              << (c1->getType() == "Barbarian" ? c1->getId() : c2->getId()) << "." << std::endl;
+
+                    if (c1->getType() == "Military") {
+                        engageCombat(c1, c2);
+                    } else {
+                        engageCombat(c2, c1);
+                    }
+                    }
+            }
+        }
+    }
+}
+
 void Simulator::advanceSimulation(int n) {
     for (int i = 0; i < n; ++i) {
-        std::cout << "Simulação avançando instante " << (i + 1) << " de " << n << "." << std::endl;
+        std::cout << "Simulacao avancando instante " << (i + 1) << " de " << n << "." << std::endl;
 
         for (auto& caravan : caravans) {
-            if (caravan->isAuto()) {
-                if (caravan->isActive()) {
-                    if (caravan->getType() == "Trade") {
-                        handleTradeCaravanAuto(caravan);
-                    } else if (caravan->getType() == "Military") {
-                        handleMilitaryCaravanAuto(caravan);
-                    }
-                } else {
-                    handleCaravanWithoutCrew(caravan);
+            if (caravan->isAuto() && caravan->isActive()) {
+                if (caravan->getType() == "Military") {
+                    handleMilitaryCaravanAuto(caravan);
+                } else if (caravan->getType() == "Trade") {
+                    handleTradeCaravanAuto(caravan);
                 }
             }
         }
 
+        // Processar combates após os movimentos
+        processCombats();
+
         // Atualiza o mapa e exibe o estado
         displayMap();
-
-        // Exibe informações adicionais, como estado das caravanas
         showCaravanStatus();
     }
 }
 
+
+bool Simulator::areAdjacent(int row1, int col1, int row2, int col2) {
+    return (abs(row1 - row2) + abs(col1 - col2)) == 1;
+}
 
 
 void Simulator::showPrices() const {

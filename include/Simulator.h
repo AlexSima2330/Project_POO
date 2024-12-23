@@ -36,13 +36,16 @@ public:
 
     // Geral (podes deixar no Simulator.cpp)
     void advanceSimulation(int n);
+    bool areAdjacent(int row1, int col1, int row2, int col2);
     void showCaravanStatus();
     void showPrices() const;
     void addCoins(int n);
+    void processCombats();
 
     // Map/ambiente (Simulator_MapActions.cpp)
     void listCityCaravans(char cityName) const;
     void createSandstorm(int l, int c, int r);
+    void engageCombat(Caravan* military, Caravan* barbarian);
 
     void handleTradeCaravanInSandstorm(TradeCaravan* caravan);
     void handleMilitaryCaravanInSandstorm(MilitaryCaravan* caravan);

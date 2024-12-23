@@ -11,14 +11,14 @@ public:
     }
 
     void move(const std::string& direction) override {
-        cout << "[BarbarianCaravan] ID: " << id << " moveu-se na direção " << direction << "." << endl;
+        cout << "[BarbarianCaravan] ID: " << id << " moveu-se na direcao " << direction << "." << endl;
         Caravan::move(direction); // Movimento básico herdado
     }
 
     void status() const override {
         cout << "[BarbarianCaravan] ID: " << id
-             << ", Posição: (" << row << ", " << col << ")"
-             << ", Bárbaros: " << crew << endl;
+             << ", Posicao: (" << row << ", " << col << ")"
+             << ", Barbaros: " << crew << endl;
     }
 
     int consumeWater() const override {

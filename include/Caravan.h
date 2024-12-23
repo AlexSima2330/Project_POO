@@ -109,6 +109,7 @@ public:
     int getCargo() const { return cargo; }
     int getMaxCargo() const { return maxCargo; }
     void setCargo(int newCargo) { cargo = newCargo; }
+    int getMaxWater() const { return maxWater; }
 
     bool addCargo(int quantity); // Adiciona uma quantidade de carga, respeitando o limite máximo.
     bool removeCargo(int quantity); // Remove uma quantidade de carga, sem permitir valores negativos.
