@@ -15,10 +15,12 @@ private:
     int rows;
     int cols;
     vector<std::vector<char>> grid;
-    vector<City> cities;
+    vector<City> cities; // Vetor de cidades no mapa
 
 public:
     Map(int rows, int cols);
+    std::vector<City>& getCities();              // Acesso não constante
+    const std::vector<City>& getCities() const;
 
     // Método para ajustar coordenadas para o comportamento circular
     pair<int, int> wrapCoordinates(int row, int col) const;

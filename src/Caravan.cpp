@@ -73,7 +73,7 @@ void Caravan::status() const {
 TradeCaravan::TradeCaravan(int id, int initialCrew)
     : Caravan(id, "Trade") {
     maxCargo = 5;       // Capacidade máxima de carga para TradeCaravan
-    maxWater = 400;      // Capacidade máxima de água
+    maxWater = 5;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;
     cargo = 2;// Número inicial de tripulantes
@@ -100,11 +100,21 @@ void TradeCaravan::move(const std::string& direction) {
 MilitaryCaravan::MilitaryCaravan(int id, int initialCrew)
     : Caravan(id, "Military") {
     maxCargo = 5;        // Capacidade máxima de carga para MilitaryCaravan
-    maxWater = 400;      // Capacidade máxima de água
+    maxWater = 5;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;
     cargo = 3;// Número inicial de tripulantes
 }
+
+SecretCaravan::SecretCaravan(int id, int initialCrew)
+    : Caravan(id, "Secret") {
+    crew = initialCrew;
+    maxCargo = 0;
+    maxWater = 0;
+    water = 0;
+    cargo = 0;
+}
+
 
 int MilitaryCaravan::consumeWater() const {
     if (crew == 0 || crew <= 10) {

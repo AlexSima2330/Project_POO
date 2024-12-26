@@ -32,20 +32,21 @@ void Simulator::run() {
                 if (!filename.empty()) {
                     if (loadMap(filename)) {
                         cout << "Mapa carregado com sucesso do ficheiro: " << filename << endl;
-
+                        initializeCityCaravans(); // Inicializa caravanas nas cidades
+                        mapLoaded = true;
                         // Adicionar caravanas aqui, após o mapa ser carregado
-                        Caravan* trade = new TradeCaravan(1, 20);
-                        trade->setPosition(2, 7);
-                        addCaravan(trade, 2, 7);
+                        //Caravan* trade = new TradeCaravan(1, 5);
+                        //trade->setPosition(2, 7);
+                        //addCaravan(trade, 2, 7);
                         //trade->setWater(10);
 
-                        Caravan* military = new MilitaryCaravan(2, 40);
-                        military->setPosition(7, 4);
-                        addCaravan(military, 7, 4);
+                        //Caravan* military = new MilitaryCaravan(2, 40);
+                       // military->setPosition(7, 4);
+                      //  addCaravan(military, 7, 4);
                         //military->setWater(10);
 
-                        trade->processMovement(map);     // Para a TradeCaravan
-                        military->processMovement(map); // Para a MilitaryCaravan
+                        //trade->processMovement(map);     // Para a TradeCaravan
+                        //military->processMovement(map); // Para a MilitaryCaravan
 
                         mapLoaded = true;
                     } else {
@@ -70,7 +71,7 @@ void Simulator::run() {
      << "Comandos disponiveis na fase 2:\n"
      << "  exec <ficheiro>   - Executa comandos a partir de um ficheiro\n"
      << "  prox <n>          - Avanca a simulacao n instantes\n"
-     //<< "  comprac <C> <T>   - Compra uma caravana do tipo T na cidade C\n"
+     << "  comprac <C> <T>   - Compra uma caravana do tipo T na cidade C\n"
      << "  precos            - Lista os precos das mercadorias\n"
      << "  cidade <C>        - Lista o conteudo da cidade C\n"
      << "  caravana <N>      - Mostra a descricao da caravana N\n"
@@ -115,18 +116,25 @@ void Simulator::run() {
                         processPhase2Command(*this, line); // Executa cada comando do ficheiro
                     }
                 }
-            }
-            else if (command == "terminar") {
-                cout << "A simulacao terminou. Voltando a fase 1..." << endl;
-                // Aqui não faz return, nem break do programa inteiro,
-                // Apenas break do loop da fase 2, voltando ao loop externo do run()
-                break;
             } else {
                 processPhase2Command(*this, command);
+                if (command == "terminar") {
+                    break; // Garante que saímos corretamente do loop
+                }
             }
         }
     }
 }
+
+void Simulator::initializeCityCaravans() {
+    int globalCaravanID = 1; // ID único para todas as caravanas
+
+    for (auto& city : map.getCities()) {
+        city.initializeCaravans(globalCaravanID); // Passa o contador global
+    }
+}
+
+
 void Simulator::showCaravanStatus()  {
     std::cout << "Status das Caravanas no instante atual:" << std::endl;
     for (const auto& caravan : caravans) {
@@ -136,6 +144,7 @@ void Simulator::showCaravanStatus()  {
 
 void Simulator::advanceSimulation(int n) {
     for (int i = 0; i < n; ++i) {
+        elapsedInstants++;
         std::cout << "Simulação avançando instante " << (i + 1) << " de " << n << "." << std::endl;
 
         for (auto& caravan : caravans) {
@@ -169,4 +178,12 @@ void Simulator::showPrices() const {
 void Simulator::addCoins(int n) {
     wallet.addCoins(n); // Usa a funcionalidade da Wallet
     cout << "Moedas atualizadas. Novo saldo: " << wallet.getCoins() << endl;
+}
+
+void Simulator::endSimulation() {
+    std::cout << "\n--- Fim da Simulacao ---\n";
+    std::cout << "Instantes decorridos: " << elapsedInstants << std::endl;
+    std::cout << "Combates vencidos: " << totalCombatsWon << std::endl;
+    std::cout << "Moedas restantes: " << wallet.getCoins() << std::endl;
+    std::cout << "-------------------------\n";
 }

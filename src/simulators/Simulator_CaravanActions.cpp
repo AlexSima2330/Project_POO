@@ -119,8 +119,52 @@ void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direc
 }
 
 // Novos métodos relacionados a caravanas
-void Simulator::buyCaravan(char cityName, char tipo) {
-    cout << "Comprar caravana tipo " << tipo << " na cidade " << cityName << " (não implementado)." << endl;
+void Simulator::buyCaravan(char cityName, char type) {
+    City* city = map.getCityByName(cityName);
+    if (!city) {
+        std::cout << "Erro: Cidade '" << cityName << "' não encontrada." << std::endl;
+        return;
+    }
+
+    // Verifica se há moedas suficientes
+    if (wallet.getCoins() < 100) {
+        std::cout << "Erro: Moedas insuficientes para comprar uma caravana." << std::endl;
+        return;
+    }
+
+    // Percorre as caravanas da cidade
+    for (auto& caravan : city->getCaravans()) {
+        if ((type == 'C' && caravan->getType() == "Trade") ||
+            (type == 'M' && caravan->getType() == "Military") ||
+            (type == 'S' && caravan->getType() == "Secret")) {
+
+            // Verifica se a caravana já foi comprada
+            if (!caravan->isInCity()) {
+                std::cout << "Erro: Esta caravana já foi comprada nesta cidade." << std::endl;
+                return;
+            }
+
+            // Deduz moedas
+            wallet.deductCoins(100);
+
+            // Marca a caravana como comprada
+            caravan->setInCity(true); // Continua na cidade
+            caravan->setAuto(false); // Desativa o modo automático
+            caravan->setOwned(true); // Nova flag para indicar que foi comprada
+
+            // Adiciona ao vetor global de caravanas
+            this->caravans.push_back(caravan);
+
+            // Atualiza o mapa com o ID da caravana
+            map.setCell(city->getRow(), city->getCol(), '0' + caravan->getId());
+            caravan->setPosition(city->getRow(), city->getCol());
+
+            std::cout << "Caravana do tipo '" << type << "' comprada com sucesso na cidade '" << cityName << "'." << std::endl;
+            return;
+            }
+    }
+
+    std::cout << "Erro: Não há caravanas do tipo '" << type << "' disponíveis para compra na cidade '" << cityName << "'." << std::endl;
 }
 
 void Simulator::showCaravanDetails(int caravanId) const {
@@ -358,5 +402,11 @@ void Simulator::handleMilitaryCaravanInSandstorm(MilitaryCaravan* caravan) {
     } else {
         std::cout << "[Tempestade] Caravana Militar ID: " << caravan->getId()
                   << " perdeu 10% dos tripulantes, mas sobreviveu." << std::endl;
+    }
+}
+
+void Simulator::handleCombatResult(bool playerWon) {
+    if (playerWon) {
+        totalCombatsWon++;
     }
 }

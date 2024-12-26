@@ -74,9 +74,10 @@ void Simulator::displayMap() {
 void Simulator::listCityCaravans(char cityName) const {
     City* city = map.getCityByName(cityName);
     if (city) {
+        std::cout << "Listando caravanas na cidade " << cityName << ":\n";
         city->listCaravans();
     } else {
-        std::cout << "Cidade " << cityName << " não encontrada." << std::endl;
+        std::cout << "Erro: Cidade '" << cityName << "' não encontrada." << std::endl;
     }
 }
 

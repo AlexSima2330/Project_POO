@@ -21,8 +21,7 @@ protected:
     int movesThisTurn;
     bool isAutoManaged = false; // Indica se a caravana está em modo automático
     int autoTurnsWithoutCrew = 0; // Contador para caravana sem tripulantes
-
-
+    bool owned = false;
 
 public:
     // Construtor
@@ -123,9 +122,10 @@ public:
     void resetAutoTurnsWithoutCrew() { autoTurnsWithoutCrew = 0; }
     int getAutoTurnsWithoutCrew() const { return autoTurnsWithoutCrew; }
 
+    bool isOwned() const { return owned; }
+    void setOwned(bool value) { owned = value; }
+
     virtual ~Caravan() = default;
-
-
 
 };
 
@@ -160,21 +160,15 @@ public:
 };
 
 class SecretCaravan : public Caravan {
-private:
-    bool stealthMode;
-    int specialResource;
-
 public:
     SecretCaravan(int id, int initialCrew);
 
-    void activateStealthMode();
-    void deactivateStealthMode();
-    bool isStealthActive() const;
+    int consumeWater() const override { return 0; }
+    int getMaxMovesPerTurn() const override { return 1; }
+    void move(const std::string& direction) override {}
+    void status() const override {}
 
-    void useSpecialResource();
-    int consumeWater() const override;
-    void move(const std::string &direction) override;
-    void status() const override;
+    ~SecretCaravan() override = default;
 };
 
 #endif

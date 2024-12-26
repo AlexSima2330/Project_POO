@@ -76,8 +76,8 @@ void Map::display() const {
 
 //Gerir cidades
 void Map::addCity(char name, int row, int col) {
-    cities.emplace_back(name);
-    grid[row][col] = name;  // Marca a posição da cidade no mapa com o seu nome
+    cities.emplace_back(name, row, col);
+    grid[row][col] = name; // Marca a posição no mapa com a letra da cidade
 }
 
 City* Map::getCityByName(char name) const {
@@ -88,6 +88,15 @@ City* Map::getCityByName(char name) const {
     }
     return nullptr;
 }
+
+vector<City>& Map::getCities() {
+    return cities;
+}
+
+const std::vector<City>& Map::getCities() const {
+    return cities;
+}
+
 
 City* Map::getCityAt(int row, int col) {
     char cell = getCell(row, col);

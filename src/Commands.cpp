@@ -20,10 +20,15 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         }
     } else if (command.find("comprac") == 0) {
         std::istringstream iss(command);
-        std::string cmd; iss >> cmd;
-        char cityName, tipo;
-        iss >> cityName >> tipo;
-        sim.buyCaravan(cityName, tipo);
+        std::string cmd;
+        char cityName, type;
+        iss >> cmd >> cityName >> type;
+
+        if (!iss.fail()) {
+            sim.buyCaravan(cityName, type);
+        } else {
+            std::cout << "Erro: Uso inválido do comando 'comprac'. Uso correto: comprac <C> <T>" << std::endl;
+        }
     } else if (command == "precos") {
         sim.showPrices();
     } else if (command.find("cidade") == 0) {
@@ -109,7 +114,7 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         if (!iss.fail() && crewCount > 0) {
             sim.buyCrewForCaravan(caravanId, crewCount);
         } else {
-            std::cout << "Erro: Formato inválido para o comando 'tripul'. Uso: tripul <caravanId> <quantidade>" << std::endl;
+            std::cout << "Erro: Formato invalido para o comando 'tripul'. Uso: tripul <caravanId> <quantidade>" << std::endl;
         }
     }
     else if (command.find("saves") == 0) {
@@ -126,7 +131,11 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         std::istringstream iss(command);
         std::string cmd, nome; iss >> cmd >> nome;
         sim.deleteSavedState(nome);
+    } else if (command == "terminar") {
+        sim.endSimulation();
+        std::cout << "A simulacao terminou. Voltando a fase 1..." << std::endl;
+        return; // Sinaliza o fim da simulação
     } else {
-        std::cout << "Comando inválido." << std::endl;
+        std::cout << "Comando invalido." << std::endl;
     }
 }

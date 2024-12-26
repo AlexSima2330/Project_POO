@@ -16,6 +16,9 @@ private:
     int mapRows, mapCols;
     Buffer buffer;
     Wallet wallet;
+    int elapsedInstants = 0; // Contador de instantes
+    int totalCombatsWon = 0; // Contador de combates vencidos
+    std::vector<Caravan*> simulatorCaravans;
 
 public:
     Simulator();
@@ -68,6 +71,11 @@ public:
     void loadBufferState(const std::string &nome);
     void listSavedStates() const;
     void deleteSavedState(const std::string &nome);
+
+    void handleCombatResult(bool playerWon);
+    void initializeCityCaravans();
+
+    void endSimulation();
 };
 
 #endif
