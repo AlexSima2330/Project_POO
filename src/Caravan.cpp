@@ -108,11 +108,19 @@ MilitaryCaravan::MilitaryCaravan(int id, int initialCrew)
 
 SecretCaravan::SecretCaravan(int id, int initialCrew)
     : Caravan(id, "Secret") {
+    maxCargo = 5;        // Capacidade máxima de carga para MilitaryCaravan
+    maxWater = 5;      // Capacidade máxima de água
+    water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;
-    maxCargo = 0;
-    maxWater = 0;
-    water = 0;
-    cargo = 0;
+    cargo = 3;// Número inicial de tripulantes
+}
+
+int SecretCaravan::consumeWater() const {
+    if (crew == 0 || crew <= 10) {
+        return 1; // Sem tripulantes ou metade ou menos dos tripulantes
+    } else {
+        return 3; // Mais de 10 tripulantes
+    }
 }
 
 
@@ -126,6 +134,11 @@ int MilitaryCaravan::consumeWater() const {
 
 // Movimento especializado para MilitaryCaravan
 void MilitaryCaravan::move(const std::string& direction) {
+    cout << "[MilitaryCaravan] ID: " << id << " a mover-se para " << direction << "." << endl;
+    Caravan::move(direction);
+}
+
+void SecretCaravan::move(const std::string& direction) {
     cout << "[MilitaryCaravan] ID: " << id << " a mover-se para " << direction << "." << endl;
     Caravan::move(direction);
 }

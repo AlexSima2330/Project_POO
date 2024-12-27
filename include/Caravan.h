@@ -161,14 +161,15 @@ public:
 
 class SecretCaravan : public Caravan {
 public:
+    // Construtor
     SecretCaravan(int id, int initialCrew);
 
-    int consumeWater() const override { return 0; }
-    int getMaxMovesPerTurn() const override { return 1; }
-    void move(const std::string& direction) override {}
-    void status() const override {}
+    // Movimento especializado
+    void move(const std::string& direction) override;
 
-    ~SecretCaravan() override = default;
+    int consumeWater() const override;
+
+    int getMaxMovesPerTurn() const override { return 3; }
 };
 
 #endif
