@@ -19,6 +19,7 @@ private:
     int elapsedInstants = 0; // Contador de instantes
     int totalCombatsWon = 0; // Contador de combates vencidos
     std::vector<Caravan*> simulatorCaravans;
+    bool shouldEndSimulation();
 
 public:
     Simulator();
@@ -74,6 +75,7 @@ public:
 
     void handleCombatResult(bool playerWon);
     void initializeCityCaravans();
+    void checkAndEndSimulation();
 
     void endSimulation();
 };

@@ -104,7 +104,9 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         std::istringstream iss(command);
         std::string cmd; iss >> cmd;
         int n; iss >> n;
-        sim.addCoins(n);
+
+        sim.addCoins(n); // Atualiza moedas
+        sim.checkAndEndSimulation(); // Verifica se deve terminar
     } else if (command.find("tripul") == 0) {
         std::istringstream iss(command);
         std::string cmd;

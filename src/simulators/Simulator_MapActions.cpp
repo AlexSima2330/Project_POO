@@ -66,7 +66,15 @@ void Simulator::displayMap() {
     buffer.printToConsole();
 
     // Exibe moedas iniciais
-    cout << "Moedas iniciais: " << wallet.getCoins() << std::endl;
+    cout << "moedas " << wallet.getCoins() << std::endl;
+   /* cout << "instantes_entre_novos_itens  " << wallet.getCoins() << std::endl;
+    cout << "duração_item " << wallet.getCoins() << std::endl;
+    cout << "max_itens " << wallet.getCoins() << std::endl;
+    cout << "preço_venda_mercadoria " << wallet.getCoins() << std::endl;
+    cout << "preço_compra_mercadoria " << wallet.getCoins() << std::endl;
+    cout << "preço_caravana " << wallet.getCoins() << std::endl;
+    cout << "instantes_entre_novos_barbaros " << wallet.getCoins() << std::endl;
+    cout << "duração_barbaros " << wallet.getCoins() << std::endl;*/
 }
 
 

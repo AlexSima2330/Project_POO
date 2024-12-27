@@ -67,6 +67,11 @@ void Simulator::run() {
         while (true) {
             displayMap();
 
+            if (shouldEndSimulation()) {
+                endSimulation();
+                return; // Sai completamente da simulação
+            }
+
             cout << "Digite um comando ou 'terminar' para voltar a fase 1.\n"
      << "Comandos disponiveis na fase 2:\n"
      << "  exec <ficheiro>   - Executa comandos a partir de um ficheiro\n"
@@ -114,10 +119,12 @@ void Simulator::run() {
                     string line;
                     while (getline(file, line)) {
                         processPhase2Command(*this, line); // Executa cada comando do ficheiro
+                        checkAndEndSimulation();
                     }
                 }
             } else {
                 processPhase2Command(*this, command);
+                checkAndEndSimulation();
                 if (command == "terminar") {
                     break; // Garante que saímos corretamente do loop
                 }
@@ -163,11 +170,16 @@ void Simulator::advanceSimulation(int n) {
 
         // Atualiza o mapa e exibe o estado
         displayMap();
-
-        // Exibe informações adicionais, como estado das caravanas
         showCaravanStatus();
+
+        // 🔄 Verificação automática
+        if (shouldEndSimulation()) {
+            endSimulation();
+            return; // Sai imediatamente da simulação
+        }
     }
 }
+
 
 void Simulator::showPrices() const {
     cout << "Precos das mercadorias nas cidades (T):" << endl;
@@ -186,4 +198,33 @@ void Simulator::endSimulation() {
     std::cout << "Combates vencidos: " << totalCombatsWon << std::endl;
     std::cout << "Moedas restantes: " << wallet.getCoins() << std::endl;
     std::cout << "-------------------------\n";
+}
+
+bool Simulator::shouldEndSimulation() {
+    bool noCaravans = caravans.empty();
+    bool insufficientFunds = wallet.getCoins() < 100;
+    bool noAvailableCaravansInCities = true;
+
+    // Verifica se existem caravanas disponíveis nas cidades
+    for (const auto& city : map.getCities()) {
+        for (const auto& caravan : city.getCaravans()) {
+            if (!caravan->isOwned() && wallet.getCoins() >= 100) { // Se houver caravanas não compradas e dinheiro suficiente
+                noAvailableCaravansInCities = false;
+                break;
+            }
+        }
+        if (!noAvailableCaravansInCities) {
+            break;
+        }
+    }
+
+    return noCaravans && insufficientFunds && noAvailableCaravansInCities;
+}
+
+void Simulator::checkAndEndSimulation() {
+    if (shouldEndSimulation()) {
+        std::cout << "\nMeios insuficientes para continuar...\n";
+        endSimulation();
+        exit(0); // Sai imediatamente
+    }
 }
