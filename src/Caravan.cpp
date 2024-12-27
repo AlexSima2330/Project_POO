@@ -15,9 +15,33 @@ void Caravan::setPosition(int newRow, int newCol) {
 
 // Movimento baseado na direção
 void Caravan::move(const std::string& direction) {
+
+    if (type == "Secret" && isCurrentlyInvisible()) {
+        std::cout << "[Erro] Caravana Secreta esta invisivel e nao pode mover-se!" << std::endl;
+        return;
+    }
+
     int oldRow = row;
     int oldCol = col;
-    // Movimento baseado na direção
+
+    // Movimento personalizado para Caravana Secreta
+    if (type == "Secret") {
+        if (direction == "2D") {
+            col += 2; // Move duas casas para a direita
+            return;
+        } else if (direction == "2E") {
+            col -= 2; // Move duas casas para a esquerda
+            return;
+        } else if (direction == "2C") {
+            row -= 2; // Move duas casas para cima
+            return;
+        } else if (direction == "2B") {
+            row += 2; // Move duas casas para baixo
+            return;
+        }
+    }
+
+    // Movimento padrão para todas as caravanas
     if (direction == "D") {
         ++col;
     } else if (direction == "E") {
@@ -35,28 +59,38 @@ void Caravan::move(const std::string& direction) {
     } else if (direction == "BD") {
         ++row; ++col;
     } else {
-        std::cout << "Direção inválida: " << direction << std::endl;
+        if (type == "Secret" && (direction == "2D" || direction == "2E" || direction == "2C" || direction == "2B")) {
+            std::cout << "Direção invalida para Caravana Secreta: " << direction << std::endl;
+        } else {
+            std::cout << "Direção invalida: " << direction << std::endl;
+        }
     }
 }
 
 
 // Processa consumo de água e inatividade
 bool Caravan::processMovement(Map& map) {
-    int waterConsumption = consumeWater(); // Consumo de água específico da subclasse
+    int waterConsumption = consumeWater();
+
     if (water >= waterConsumption) {
-        water -= waterConsumption; // Reduz a água disponível
-        return true; // Movimento permitido
+        water -= waterConsumption;
+        return true; // Movimento permitido, água suficiente
     }
 
-    loseCrew(1); // Perde 1 tripulante por falta de água
-    std::cout << "[Caravana] ID: " << id << " sem água suficiente. Perdeu 1 tripulante. Tripulantes restantes: " << crew << std::endl;
-
-    if (!isActive()) {
-        return false; // Movimento não permitido se não houver tripulantes
+    // Se a água chegou a zero, verifica se é uma Caravana Secreta
+    if (water <= 0) {
+        if (type == "Secret") {
+            becomeObstacle(map); // Torna-se um obstáculo no mapa
+            return false; // Não pode mais se mover
+        }
     }
 
-    return true; // Movimento permitido, mas com penalização
+    // Caso contrário, perde tripulantes apenas para outras caravanas
+    loseCrew(1);
+
+    return isActive(); // Movimento permitido apenas se ainda estiver ativa
 }
+
 
 
 // Exibe o status básico
@@ -116,10 +150,12 @@ SecretCaravan::SecretCaravan(int id, int initialCrew)
 }
 
 int SecretCaravan::consumeWater() const {
-    if (crew == 0 || crew <= 10) {
-        return 1; // Sem tripulantes ou metade ou menos dos tripulantes
-    } else {
-        return 3; // Mais de 10 tripulantes
+    return 1;
+}
+void SecretCaravan::handleNoWater(Map& map) {
+    if (water <= 0) {
+        std::cout << "[Caravana Secreta] ID: " << id << " ficou sem água e tornou-se um obstáculo permanente no mapa." << std::endl;
+        becomeObstacle(map); // Torna-se um obstáculo permanente no mapa
     }
 }
 
@@ -164,5 +200,25 @@ bool Caravan::removeCargo(int quantity) {
 void Caravan::becomeObstacle(Map &map) {
     auto [wrappedRow, wrappedCol] = map.wrapCoordinates(row, col);
     map.setCell(wrappedRow, wrappedCol, '+'); // Marca como obstáculo no mapa
-    cout << "[Caravana] ID: " << id << " tornou-se um obstáculo em (" << wrappedRow << ", " << wrappedCol << ")." << endl;
+    cout << "[Caravana] ID: " << id << " tornou-se um obstaculo em (" << wrappedRow << ", " << wrappedCol << ")." << endl;
+}
+
+void Caravan::activateInvisibility() {
+    if (type == "Secret" && !isInvisible) {
+        isInvisible = true;
+        invisibleTurns = 3; // A invisibilidade dura 3 turnos
+        std::cout << "[Caravana Secreta] ID: " << id << " ativou o Modo Invisivel por 3 turnos!" << std::endl;
+    } else if (isInvisible) {
+        std::cout << "[Caravana Secreta] ID: " << id << " já está invisivel!" << std::endl;
+    }
+}
+
+void Caravan::updateInvisibility() {
+    if (isInvisible) {
+        invisibleTurns--;
+        if (invisibleTurns <= 0) {
+            isInvisible = false;
+            std::cout << "[Caravana Secreta] ID: " << id << " saiu do Modo Invisível!" << std::endl;
+        }
+    }
 }

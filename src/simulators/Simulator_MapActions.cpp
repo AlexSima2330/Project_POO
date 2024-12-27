@@ -54,11 +54,40 @@ void Simulator::displayMap() {
     int startRow = (bufferRows > map.getRows()) ? (bufferRows - map.getRows()) / 2 : 0;
     int startCol = (bufferCols > map.getCols()) ? (bufferCols - map.getCols()) / 2 : 0;
 
+    // Remove temporariamente as caravanas secretas invisíveis do mapa
+    for (const auto& caravan : caravans) {
+        if (caravan->getType() == "Secret" && caravan->isCurrentlyInvisible()) {
+            map.setCell(caravan->getRow(), caravan->getCol(), '.'); // Remove temporariamente do mapa
+        }
+    }
+
+    // Preenche o buffer com as caravanas, respeitando cidades e invisibilidade
+    for (const auto& caravan : caravans) {
+        if (caravan->getType() == "Secret" && caravan->isCurrentlyInvisible()) {
+            continue; // Não exibe caravanas invisíveis
+        }
+
+        int row = caravan->getRow();
+        int col = caravan->getCol();
+
+        // Certifica-te de que não sobrescreves cidades
+        if (!map.isCity(row, col)) {
+            buffer.setCursor(startRow + row, startCol + col);
+            buffer.putChar('0' + caravan->getId());
+        }
+    }
+
     // Preenche o buffer com os elementos do mapa
     for (int i = 0; i < map.getRows(); ++i) {
         for (int j = 0; j < map.getCols(); ++j) {
             buffer.setCursor(startRow + i, startCol + j);
             buffer.putChar(map.getCell(i, j)); // Adiciona o conteúdo real da célula do mapa
+        }
+    }
+
+    for (const auto& caravan : caravans) {
+        if (caravan->getType() == "Secret" && caravan->isCurrentlyInvisible()) {
+            map.setCell(caravan->getRow(), caravan->getCol(), '0' + caravan->getId()); // Restaura no mapa
         }
     }
 

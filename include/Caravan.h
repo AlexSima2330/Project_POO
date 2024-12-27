@@ -22,6 +22,8 @@ protected:
     bool isAutoManaged = false; // Indica se a caravana está em modo automático
     int autoTurnsWithoutCrew = 0; // Contador para caravana sem tripulantes
     bool owned = false;
+    bool isInvisible = false; // Estado de invisibilidade
+    int invisibleTurns = 0;   // Contador de turnos de invisibilidade
 
 public:
     // Construtor
@@ -124,6 +126,9 @@ public:
 
     bool isOwned() const { return owned; }
     void setOwned(bool value) { owned = value; }
+    void activateInvisibility(); // Ativa o modo invisível
+    void updateInvisibility();   // Atualiza a duração da invisibilidade
+    bool isCurrentlyInvisible() const { return isInvisible; }
 
     virtual ~Caravan() = default;
 
@@ -170,6 +175,8 @@ public:
     int consumeWater() const override;
 
     int getMaxMovesPerTurn() const override { return 3; }
+
+    void handleNoWater(Map& map);
 };
 
 #endif

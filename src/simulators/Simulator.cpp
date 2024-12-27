@@ -152,9 +152,13 @@ void Simulator::showCaravanStatus()  {
 void Simulator::advanceSimulation(int n) {
     for (int i = 0; i < n; ++i) {
         elapsedInstants++;
-        std::cout << "Simulação avançando instante " << (i + 1) << " de " << n << "." << std::endl;
+        std::cout << "Simulacao avancando instante " << (i + 1) << " de " << n << "." << std::endl;
 
         for (auto& caravan : caravans) {
+            if (caravan->getType() == "Secret") {
+                caravan->updateInvisibility();
+            }
+
             if (caravan->isAuto()) {
                 if (caravan->isActive()) {
                     if (caravan->getType() == "Trade") {
@@ -163,20 +167,22 @@ void Simulator::advanceSimulation(int n) {
                         handleMilitaryCaravanAuto(caravan);
                     }
                 } else {
+                    if (caravan->getType() == "Secret" && caravan->getWater() <= 0) {
+                        caravan->becomeObstacle(map);
+                        removeCaravan(caravan);
+                        continue;
+                    }
                     handleCaravanWithoutCrew(caravan);
                 }
             }
         }
 
-        // Atualiza o mapa e exibe o estado
-        displayMap();
-        showCaravanStatus();
-
-        // 🔄 Verificação automática
+        // Verificação automática
         if (shouldEndSimulation()) {
             endSimulation();
             return; // Sai imediatamente da simulação
         }
+        showCaravanStatus();
     }
 }
 

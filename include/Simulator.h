@@ -77,6 +77,9 @@ public:
     void initializeCityCaravans();
     void checkAndEndSimulation();
 
+    const std::vector<Caravan*>& getCaravans() const { return caravans; }
+
+
     void endSimulation();
 };
 

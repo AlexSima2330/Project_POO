@@ -137,6 +137,19 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         sim.endSimulation();
         std::cout << "A simulacao terminou. Voltando a fase 1..." << std::endl;
         return; // Sinaliza o fim da simulação
+    } else if (command.find("invisible") == 0) {
+        std::istringstream iss(command);
+        std::string cmd;
+        int caravanId;
+        iss >> cmd >> caravanId;
+
+        for (auto& caravan : sim.getCaravans()) {
+            if (caravan->getId() == caravanId && caravan->getType() == "Secret") {
+                caravan->activateInvisibility();
+                return;
+            }
+        }
+        std::cout << "Erro: Caravana secreta com ID " << caravanId << " não encontrada ou não é do tipo Secret." << std::endl;
     } else {
         std::cout << "Comando invalido." << std::endl;
     }

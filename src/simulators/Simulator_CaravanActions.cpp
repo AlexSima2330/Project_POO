@@ -68,7 +68,7 @@ void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direc
             // Verifica se o destino é um obstáculo
             char destinationCell = map.getCell(newRow, newCol);
             if (destinationCell == '+') {
-                std::cout << "[Erro] Movimento inválido: destino contém um obstáculo." << std::endl;
+                std::cout << "[Erro] Movimento invalido: destino contem um obstaculo." << std::endl;
 
                 // Restaura a posição anterior da caravana
                 caravan->setPosition(oldRow, oldCol);
@@ -77,7 +77,7 @@ void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direc
 
             // Verifica se o destino já contém uma caravana
             if (std::isdigit(destinationCell)) {
-                std::cout << "[Erro] Movimento inválido: destino já contém outra caravana." << std::endl;
+                std::cout << "[Erro] Movimento invalido: destino ja contem outra caravana." << std::endl;
 
                 // Restaura a posição anterior da caravana
                 caravan->setPosition(oldRow, oldCol);
@@ -294,6 +294,12 @@ void Simulator::handleMilitaryCaravanAuto(Caravan* caravan) {
 
 void Simulator::handleCaravanWithoutCrew(Caravan* caravan) {
     caravan->incrementAutoTurnsWithoutCrew();
+
+    if (caravan->getType() == "Secret" && caravan->getWater() <= 0) {
+        caravan->becomeObstacle(map);
+        removeCaravan(caravan);
+        return;
+    }
 
     if (caravan->getAutoTurnsWithoutCrew() > (caravan->getType() == "Trade" ? 5 : 7)) {
         std::cout << "Caravana " << caravan->getId() << " desapareceu por falta de tripulantes." << std::endl;
