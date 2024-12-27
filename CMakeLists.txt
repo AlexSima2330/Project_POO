@@ -22,6 +22,8 @@ set(SOURCE_FILES
         src/simulators/Simulator_CaravanActions.cpp
         src/simulators/Simulator_Storage.cpp
         include/BarbarianCaravan.h
+        include/Item.h
+        src/Item.cpp
 )
 
 add_executable(Project_POO ${SOURCE_FILES})

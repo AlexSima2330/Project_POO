@@ -73,7 +73,7 @@ void Buffer::printToConsole() const {
         for (int j = 0; j < cols; j++) {
             std::cout << screen[i][j];
         }
-        std::cout << "\n";
+        std::cout << std::endl; // Salto de linha após cada linha do buffer
     }
 }
 
@@ -112,7 +112,7 @@ Buffer& operator<<(Buffer &buffer, const char *str) {
 
 // Operador << para inteiros
 Buffer& operator<<(Buffer &buffer, int num) {
-    char tmp[32];
+    char tmp[64];
     std::snprintf(tmp, sizeof(tmp), "%d", num);
     buffer.putString(tmp);
     return buffer;

@@ -5,6 +5,7 @@
 #include "Wallet.h"
 #include "Map.h"
 #include "Commands.h"
+#include "Item.h"
 
 using namespace std;
 
@@ -177,6 +178,18 @@ void Simulator::advanceSimulation(int n) {
             }
         }
 
+        // 🛠️ Atualiza e verifica interações com itens
+        for (auto& caravan : caravans) {
+            checkCaravanForItem(caravan); // Verifica se a caravana apanha algum item
+        }
+
+        updateItems(); // Atualiza a duração dos itens
+
+        if (elapsedInstants % 10 == 0) {
+            spawnItem(); // Gera novos itens a cada 10 instantes
+        }
+
+
         // Verificação automática
         if (shouldEndSimulation()) {
             endSimulation();
@@ -232,5 +245,46 @@ void Simulator::checkAndEndSimulation() {
         std::cout << "\nMeios insuficientes para continuar...\n";
         endSimulation();
         exit(0); // Sai imediatamente
+    }
+}
+
+void Simulator::spawnItem() {
+    if (items.size() >= 5) return; // Máximo de 5 itens
+
+    int row = rand() % map.getRows();
+    int col = rand() % map.getCols();
+
+    if (map.getCell(row, col) == '.') { // Posição deve estar livre
+        ItemType type = static_cast<ItemType>(rand() % 5);
+        int duration = 20; // Pega do ficheiro de configuração
+
+        items.push_back(new Item(type, row, col, duration));
+        map.setCell(row, col, 'I'); // Representa um item no mapa
+        std::cout << "[Simulator] Novo item apareceu em (" << row << ", " << col << ").\n";
+    }
+}
+void Simulator::updateItems() {
+    for (auto it = items.begin(); it != items.end();) {
+        (*it)->decreaseLifetime();
+
+        if ((*it)->isExpired()) {
+            map.setCell((*it)->getRow(), (*it)->getCol(), '.'); // Remove do mapa
+            delete *it;
+            it = items.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+void Simulator::checkCaravanForItem(Caravan* caravan) {
+    for (auto it = items.begin(); it != items.end(); ++it) {
+        if (abs((*it)->getRow() - caravan->getRow()) <= 1 &&
+            abs((*it)->getCol() - caravan->getCol()) <= 1) {
+            (*it)->applyEffect(caravan);
+            map.setCell((*it)->getRow(), (*it)->getCol(), '.'); // Remove do mapa
+            delete *it;
+            items.erase(it);
+            break;
+            }
     }
 }

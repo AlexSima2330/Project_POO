@@ -12,8 +12,9 @@ bool Simulator::loadMap(const std::string& filename) {
         return false;
     }
 
+    // 📊 **Leitura Direta dos Parâmetros Configuráveis**
     int rowsConfig, colsConfig, initialCoins;
-    file >> rowsConfig >> colsConfig >> initialCoins;
+    file >> rowsConfig >> colsConfig >> initialCoins >> timeBetweenItems >> itemDuration >> maxItems;
 
     mapRows = rowsConfig;
     mapCols = colsConfig;
@@ -85,6 +86,12 @@ void Simulator::displayMap() {
         }
     }
 
+    // 🛠️ **Adiciona Representação dos Itens**
+    for (const auto& item : items) {
+        buffer.setCursor(startRow + item->getRow(), startCol + item->getCol());
+        buffer.putChar('I'); // Representa um item no mapa
+    }
+
     for (const auto& caravan : caravans) {
         if (caravan->getType() == "Secret" && caravan->isCurrentlyInvisible()) {
             map.setCell(caravan->getRow(), caravan->getCol(), '0' + caravan->getId()); // Restaura no mapa
@@ -95,15 +102,15 @@ void Simulator::displayMap() {
     buffer.printToConsole();
 
     // Exibe moedas iniciais
-    cout << "moedas " << wallet.getCoins() << std::endl;
-   /* cout << "instantes_entre_novos_itens  " << wallet.getCoins() << std::endl;
-    cout << "duração_item " << wallet.getCoins() << std::endl;
-    cout << "max_itens " << wallet.getCoins() << std::endl;
-    cout << "preço_venda_mercadoria " << wallet.getCoins() << std::endl;
-    cout << "preço_compra_mercadoria " << wallet.getCoins() << std::endl;
-    cout << "preço_caravana " << wallet.getCoins() << std::endl;
-    cout << "instantes_entre_novos_barbaros " << wallet.getCoins() << std::endl;
-    cout << "duração_barbaros " << wallet.getCoins() << std::endl;*/
+    cout << "moedas " << wallet.getCoins() << endl;
+    cout << "instantes_entre_novos_itens " << timeBetweenItems << endl;
+    cout << "duracao_item " << itemDuration << endl;
+    cout << "max_itens " << maxItems << endl;
+    //cout << "preço_venda_mercadoria " << wallet.getCoins() << std::endl;
+   // cout << "preço_compra_mercadoria " << wallet.getCoins() << std::endl;
+    //cout << "preço_caravana " << wallet.getCoins() << std::endl;
+    //cout << "instantes_entre_novos_barbaros " << wallet.getCoins() << std::endl;
+    //cout << "duração_barbaros " << wallet.getCoins() << std::endl;
 }
 
 

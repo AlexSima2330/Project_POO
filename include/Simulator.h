@@ -6,6 +6,7 @@
 #include "Caravan.h"
 #include <vector>
 #include "Buffer.h"
+#include "Item.h"
 #include "Wallet.h"
 
 class Simulator {
@@ -20,6 +21,11 @@ private:
     int totalCombatsWon = 0; // Contador de combates vencidos
     std::vector<Caravan*> simulatorCaravans;
     bool shouldEndSimulation();
+    std::vector<Item*> items; // Vetor para armazenar itens no mapa
+    int itemDuration;          // Duração dos itens no mapa
+    int maxItems;              // Número máximo de itens simultâneos
+    int timeBetweenItems;      // Intervalo entre novos itens
+
 
 public:
     Simulator();
@@ -79,6 +85,10 @@ public:
 
     const std::vector<Caravan*>& getCaravans() const { return caravans; }
 
+    //itens
+    void spawnItem();
+    void updateItems();
+    void checkCaravanForItem(Caravan* caravan);
 
     void endSimulation();
 };

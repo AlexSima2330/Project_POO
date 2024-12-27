@@ -126,7 +126,16 @@ void Map::setCell(int row, int col, char value) {
         return;
     }
 
-    grid[wrappedRow][wrappedCol] = value;
+    // Não substitui células ocupadas por caravanas
+    if (std::isdigit(grid[wrappedRow][wrappedCol]) && value != grid[wrappedRow][wrappedCol]) {
+        return;
+    }
+
+    // Permite substituir células vazias ou com itens
+    if (grid[wrappedRow][wrappedCol] == '.' || grid[wrappedRow][wrappedCol] == 'I') {
+        grid[wrappedRow][wrappedCol] = value;
+    }
 }
+
 
 
