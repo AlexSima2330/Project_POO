@@ -161,7 +161,6 @@ public:
     int consumeWater() const override;
 
     int getMaxMovesPerTurn() const override { return 3; }
-
 };
 
 class SecretCaravan : public Caravan {

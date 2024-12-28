@@ -90,6 +90,11 @@ public:
     void updateItems();
     void checkCaravanForItem(Caravan* caravan);
 
+    const Wallet& getWallet() const;
+    Wallet& getWallet();
+    void removeCaravanMine(Caravan* caravan);
+
+
     void endSimulation();
 };
 

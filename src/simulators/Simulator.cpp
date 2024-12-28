@@ -185,20 +185,17 @@ void Simulator::advanceSimulation(int n) {
 
         updateItems(); // Atualiza a duração dos itens
 
-        if (elapsedInstants % 10 == 0) {
-            spawnItem(); // Gera novos itens a cada 10 instantes
+        if (elapsedInstants % timeBetweenItems == 0) {
+            spawnItem(); // Gera novos itens de acordo com o tempo configurado
         }
-
 
         // Verificação automática
         if (shouldEndSimulation()) {
             endSimulation();
             return; // Sai imediatamente da simulação
         }
-        showCaravanStatus();
     }
 }
-
 
 void Simulator::showPrices() const {
     cout << "Precos das mercadorias nas cidades (T):" << endl;
@@ -249,20 +246,23 @@ void Simulator::checkAndEndSimulation() {
 }
 
 void Simulator::spawnItem() {
-    if (items.size() >= 5) return; // Máximo de 5 itens
+    if (items.size() >= maxItems) return; // Máximo de itens já atingido
 
     int row = rand() % map.getRows();
     int col = rand() % map.getCols();
 
-    if (map.getCell(row, col) == '.') { // Posição deve estar livre
-        ItemType type = static_cast<ItemType>(rand() % 5);
-        int duration = 20; // Pega do ficheiro de configuração
+    if (map.getCell(row, col) == '.') { // Apenas em células vazias
+        ItemType type = static_cast<ItemType>(rand() % 5); // Sorteia tipo aleatório
+
+        // Usa o valor configurado para a duração
+        int duration = itemDuration;
 
         items.push_back(new Item(type, row, col, duration));
-        map.setCell(row, col, 'I'); // Representa um item no mapa
-        std::cout << "[Simulator] Novo item apareceu em (" << row << ", " << col << ").\n";
+        map.setCell(row, col, 'I'); // Representação visual do item
+        std::cout << "[Item] Novo item apareceu em (" << row << ", " << col << "\n";
     }
 }
+
 void Simulator::updateItems() {
     for (auto it = items.begin(); it != items.end();) {
         (*it)->decreaseLifetime();
@@ -277,14 +277,66 @@ void Simulator::updateItems() {
     }
 }
 void Simulator::checkCaravanForItem(Caravan* caravan) {
-    for (auto it = items.begin(); it != items.end(); ++it) {
-        if (abs((*it)->getRow() - caravan->getRow()) <= 1 &&
-            abs((*it)->getCol() - caravan->getCol()) <= 1) {
-            (*it)->applyEffect(caravan);
-            map.setCell((*it)->getRow(), (*it)->getCol(), '.'); // Remove do mapa
-            delete *it;
-            items.erase(it);
-            break;
+    int row = caravan->getRow();
+    int col = caravan->getCol();
+
+    // Coordenadas adjacentes (Cima, Baixo, Esquerda, Direita)
+    std::vector<std::pair<int, int>> adjacentPositions = {
+        {row - 1, col}, // Cima
+        {row + 1, col}, // Baixo
+        {row, col - 1}, // Esquerda
+        {row, col + 1}  // Direita
+    };
+
+    for (auto& [adjRow, adjCol] : adjacentPositions) {
+        auto [wrappedRow, wrappedCol] = map.wrapCoordinates(adjRow, adjCol);
+
+        for (auto it = items.begin(); it != items.end(); ++it) {
+            if ((*it)->getRow() == wrappedRow && (*it)->getCol() == wrappedCol) {
+                // Aplica o efeito do item passando o simulador
+                (*it)->applyEffect(caravan, this);
+
+                // Remove o item do mapa
+                map.setCell(wrappedRow, wrappedCol, '.');
+
+                // Remove o item da lista
+                delete *it;
+                items.erase(it);
+
+                std::cout << "[Item] Caravana " << caravan->getId()
+                          << " apanhou um item na posicao (" << wrappedRow
+                          << ", " << wrappedCol << ").\n";
+                return; // Apenas um item pode ser apanhado por vez
             }
+        }
     }
+}
+
+const Wallet& Simulator::getWallet() const {
+    return wallet;
+}
+
+Wallet& Simulator::getWallet() {
+    return wallet;
+}
+
+void Simulator::removeCaravanMine(Caravan* caravan) {
+    for (auto it = caravans.begin(); it != caravans.end(); ++it) {
+        if (*it == caravan) {
+            int row = caravan->getRow();
+            int col = caravan->getCol();
+
+            // Limpa a célula no mapa
+            map.setCell(row, col, '.');
+
+            // Remove a caravana da lista
+            delete *it; // Liberta a memória
+            caravans.erase(it);
+
+            std::cout << "[Simulator] Caravana removida da posição (" << row << ", " << col << ").\n";
+            return;
+        }
+    }
+
+    std::cout << "[Erro] Tentativa de remover uma caravana que não existe.\n";
 }

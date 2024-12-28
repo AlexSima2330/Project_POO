@@ -112,6 +112,7 @@ void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direc
             // Atualiza a nova posição com o ID da caravana
             map.setCell(newRow, newCol, '0' + caravanId);
             caravan->status();
+            checkCaravanForItem(caravan);
             return;
         }
     }

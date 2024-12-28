@@ -1,8 +1,10 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-#include "Caravan.h"
-#include <string>
+#include "Caravan.h" // Garantir que Caravan está incluído
+
+// Forward Declaration
+class Simulator;
 
 enum class ItemType {
     PandoraBox,
@@ -16,17 +18,19 @@ class Item {
 private:
     ItemType type;
     int row, col;
-    int remainingTurns; // Duração do item no mapa
+    int remainingTurns;
 
 public:
     Item(ItemType type, int row, int col, int duration);
 
+    ItemType getType() const;
     int getRow() const;
     int getCol() const;
-    ItemType getType() const;
     void decreaseLifetime();
     bool isExpired() const;
-    void applyEffect(Caravan* caravan);
+
+    // Agora com forward declaration
+    void applyEffect(Caravan* caravan, Simulator* simulator);
 };
 
 #endif

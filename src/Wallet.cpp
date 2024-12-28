@@ -1,5 +1,7 @@
 #include "Wallet.h"
 
+#include <iostream>
+
 Wallet::Wallet() : coins(0) {}
 Wallet::Wallet(int initialCoins) : coins(initialCoins) {}
 
@@ -18,4 +20,11 @@ bool Wallet::deductCoins(int amount) {
         return true;
     }
     return false;
+}
+
+// Adiciona uma percentagem das moedas atuais
+void Wallet::addPercentageCoins(float percentage) {
+    int bonus = static_cast<int>(coins * (percentage / 100.0f));
+    addCoins(bonus);
+    std::cout << "[Wallet] Adicionadas " << bonus << " moedas (bónus de " << percentage << "%).\n";
 }

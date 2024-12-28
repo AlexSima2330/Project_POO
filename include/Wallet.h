@@ -12,6 +12,8 @@ public:
     int getCoins() const;
     void addCoins(int amount);
     bool deductCoins(int amount);
+
+    void addPercentageCoins(float percentage);
 };
 
 #endif
