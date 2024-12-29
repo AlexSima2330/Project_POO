@@ -42,7 +42,14 @@ bool Simulator::moveCaravan(int caravanId, char direction) {
 
 void Simulator::moveCaravanWithDirection(int caravanId, const std::string& direction) {
     for (auto caravan : caravans) {
-        if (caravan->getId() == caravanId) {
+        if (caravan->getId() == caravanId && caravan->getType() != "Barbarian") {
+
+            if ((caravan->getType() == "Trade" || caravan->getType() == "Military") && caravan->getCrew() == 0) {
+                std::cout << "[Erro] Caravana " << caravanId
+                          << " não pode ser movida manualmente porque está sem tripulantes." << std::endl;
+                return;
+            }
+
             int oldRow = caravan->getRow();
             int oldCol = caravan->getCol();
 
@@ -293,30 +300,34 @@ void Simulator::handleMilitaryCaravanAuto(Caravan* caravan) {
 
 
 
+// Simulator_CaravanActions.cpp
 void Simulator::handleCaravanWithoutCrew(Caravan* caravan) {
     caravan->incrementAutoTurnsWithoutCrew();
 
-    if (caravan->getType() == "Secret" && caravan->getWater() <= 0) {
-        caravan->becomeObstacle(map);
-        removeCaravan(caravan);
-        return;
-    }
-
-    if (caravan->getAutoTurnsWithoutCrew() > (caravan->getType() == "Trade" ? 5 : 7)) {
-        std::cout << "Caravana " << caravan->getId() << " desapareceu por falta de tripulantes." << std::endl;
-        removeCaravan(caravan);
-        return;
-    }
-
-    // Movimento baseado no tipo
     if (caravan->getType() == "Trade") {
-        std::cout << "Caravana de Comércio " << caravan->getId()
-                  << " movendo-se de forma aleatória sem tripulaçao." << std::endl;
-        caravan->move("random"); // Implementar movimento aleatório
-    } else if (caravan->getType() == "Military") {
-        std::cout << "Caravana Militar " << caravan->getId()
-                  << " movendo-se na ultima direçao conhecida." << std::endl;
-        caravan->move("last_direction"); // Implementar lógica de última direção
+        if (caravan->getAutoTurnsWithoutCrew() >= 5) {
+            std::cout << "[TradeCaravan] ID: " << caravan->getId()
+                      << " desapareceu após 5 turnos sem tripulantes." << std::endl;
+            removeCaravan(caravan);
+            return;
+        }
+        std::cout << "[TradeCaravan] ID: " << caravan->getId()
+                  << " move-se aleatoriamente sem tripulação." << std::endl;
+        caravan->moveRandomly(map); // Movimento aleatório garantido
+        return;
+    }
+
+    if (caravan->getType() == "Military") {
+        if (caravan->getAutoTurnsWithoutCrew() >= 7) {
+            std::cout << "[MilitaryCaravan] ID: " << caravan->getId()
+                      << " desapareceu após 7 turnos sem tripulantes." << std::endl;
+            removeCaravan(caravan);
+            return;
+        }
+        std::cout << "[MilitaryCaravan] ID: " << caravan->getId()
+                  << " move-se na última direção conhecida." << std::endl;
+        caravan->moveInLastDirection(map);
+        return;
     }
 }
 
@@ -333,15 +344,19 @@ void Simulator::stopCaravanAuto(int caravanId) {
 
 
 void Simulator::createBarbarianCaravan(int l, int c) {
-    // Verifica se a posição é válida e desocupada
-    if (map.getCell(l, c) == '.') {
-        Caravan* barbarian = new BarbarianCaravan(caravans.size() + 1); // ID único
-        barbarian->setPosition(l, c);
-        caravans.push_back(barbarian); // Adiciona à lista de caravanas
-        map.setCell(l, c, '!'); // Marca no mapa com o símbolo de caravana bárbara
-        cout << "Caravana barbara criada na posiçao (" << l << ", " << c << ")." << endl;
+    auto [wrappedRow, wrappedCol] = map.wrapCoordinates(l, c);
+
+    // Verifica se a célula está livre para criar a caravana
+    if (map.getCell(wrappedRow, wrappedCol) == '.') {
+        BarbarianCaravan* barbarian = new BarbarianCaravan(caravans.size() + 1);
+        barbarian->setPosition(wrappedRow, wrappedCol);
+        barbarian->setSpawnTurn(elapsedInstants);
+        caravans.push_back(barbarian);
+        map.setCell(wrappedRow, wrappedCol, '!'); // Representação visual no mapa
+
+        std::cout << "[BarbarianCaravan] Criada na posicao (" << wrappedRow << ", " << wrappedCol << ")." << std::endl;
     } else {
-        cerr << "Erro: Não e possível criar uma caravana barbara em (" << l << ", " << c << "). Posição inválida ou ocupada." << endl;
+        std::cerr << "[Erro] Não foi possivel criar uma caravana barbara em (" << wrappedRow << ", " << wrappedCol << "). Posicao ocupada ou invalida." << std::endl;
     }
 }
 
@@ -415,5 +430,87 @@ void Simulator::handleMilitaryCaravanInSandstorm(MilitaryCaravan* caravan) {
 void Simulator::handleCombatResult(bool playerWon) {
     if (playerWon) {
         totalCombatsWon++;
+    }
+}
+
+void Simulator::handleBarbarianCaravanAuto(BarbarianCaravan* caravan) {
+    if (!caravan->isActive()) {
+        removeCaravan(caravan);
+        return;
+    }
+
+    int oldRow = caravan->getRow();
+    int oldCol = caravan->getCol();
+
+    // 🎯 **1. Verificar se há uma caravana na mesma linha ou coluna dentro do raio de 8 posições**
+    Caravan* target = nullptr;
+    for (auto& other : caravans) {
+        if (other->getType() != "Barbarian") {
+            int targetRow = other->getRow();
+            int targetCol = other->getCol();
+
+            // Verifica se está na mesma linha ou coluna e dentro do alcance de 8 posições
+            if ((targetRow == oldRow && abs(targetCol - oldCol) <= 8) ||
+                (targetCol == oldCol && abs(targetRow - oldRow) <= 8)) {
+                target = other;
+                break;
+            }
+        }
+    }
+
+    if (target) {
+        // **Movimento Direcionado**
+        int targetRow = target->getRow();
+        int targetCol = target->getCol();
+
+        if (targetRow > oldRow) {
+            caravan->move("B"); // Baixo
+        } else if (targetRow < oldRow) {
+            caravan->move("C"); // Cima
+        }
+
+        if (targetCol > oldCol) {
+            caravan->move("D"); // Direita
+        } else if (targetCol < oldCol) {
+            caravan->move("E"); // Esquerda
+        }
+    } else {
+        // **Movimento Aleatório**
+        std::string directions[] = {"C", "B", "D", "E"};
+        int index = rand() % 4;
+        caravan->move(directions[index]);
+    }
+
+    // 🔄 **Atualiza a Nova Posição no Mapa**
+    int newRow = caravan->getRow();
+    int newCol = caravan->getCol();
+
+    if (map.getCell(newRow, newCol) == '.') {
+        map.setCell(oldRow, oldCol, '.'); // Limpa a posição antiga
+        map.setCell(newRow, newCol, '!'); // Atualiza para a nova posição
+    } else {
+        // Se a célula estiver ocupada, restaura a posição anterior
+        caravan->setPosition(oldRow, oldCol);
+    }
+
+    // 🕒 **Desaparecimento após `barbarianDuration` turnos**
+    if (elapsedInstants - caravan->getSpawnTurn() >= barbarianDuration) {
+        removeCaravan(caravan);
+        std::cout << "[BarbarianCaravan] ID: " << caravan->getId()
+                  << " desapareceu após " << barbarianDuration << " turnos." << std::endl;
+    }
+}
+
+void Simulator::spawnBarbarianCaravan() {
+    int row = rand() % map.getRows();
+    int col = rand() % map.getCols();
+
+    if (map.getCell(row, col) == '.') {
+        BarbarianCaravan* barbarian = new BarbarianCaravan(caravans.size() + 1);
+        barbarian->setPosition(row, col);
+        barbarian->setSpawnTurn(elapsedInstants);
+        caravans.push_back(barbarian);
+        map.setCell(row, col, '!'); // Representação visual
+        std::cout << "Nova caravana bárbara apareceu em (" << row << ", " << col << ")." << std::endl;
     }
 }

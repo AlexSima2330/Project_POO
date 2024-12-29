@@ -5,6 +5,8 @@
 #include "Map.h"
 #include "Caravan.h"
 #include <vector>
+
+#include "BarbarianCaravan.h"
 #include "Buffer.h"
 #include "Item.h"
 #include "Wallet.h"
@@ -25,7 +27,8 @@ private:
     int itemDuration;          // Duração dos itens no mapa
     int maxItems;              // Número máximo de itens simultâneos
     int timeBetweenItems;      // Intervalo entre novos itens
-
+    int timeBetweenBarbarians; // Intervalo padrão
+    int barbarianDuration;
 
 public:
     Simulator();
@@ -94,6 +97,9 @@ public:
     Wallet& getWallet();
     void removeCaravanMine(Caravan* caravan);
 
+    // Comportamento das Caravanas Bárbaras
+    void handleBarbarianCaravanAuto(BarbarianCaravan* caravan);
+    void spawnBarbarianCaravan();
 
     void endSimulation();
 };

@@ -14,7 +14,7 @@ bool Simulator::loadMap(const std::string& filename) {
 
     // 📊 **Leitura Direta dos Parâmetros Configuráveis**
     int rowsConfig, colsConfig, initialCoins;
-    file >> rowsConfig >> colsConfig >> initialCoins >> timeBetweenItems >> itemDuration >> maxItems;
+    file >> rowsConfig >> colsConfig >> initialCoins >> timeBetweenItems >> itemDuration >> maxItems >> timeBetweenBarbarians >> barbarianDuration;;
 
     mapRows = rowsConfig;
     mapCols = colsConfig;
@@ -109,8 +109,8 @@ void Simulator::displayMap() {
     //cout << "preço_venda_mercadoria " << wallet.getCoins() << std::endl;
    // cout << "preço_compra_mercadoria " << wallet.getCoins() << std::endl;
     //cout << "preço_caravana " << wallet.getCoins() << std::endl;
-    //cout << "instantes_entre_novos_barbaros " << wallet.getCoins() << std::endl;
-    //cout << "duração_barbaros " << wallet.getCoins() << std::endl;
+    cout << "instantes_entre_novos_barbaros " << timeBetweenBarbarians << std::endl;
+    cout << "duracao_barbaros " << barbarianDuration << std::endl;
 }
 
 

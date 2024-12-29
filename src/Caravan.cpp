@@ -15,6 +15,9 @@ void Caravan::setPosition(int newRow, int newCol) {
 
 // Movimento baseado na direção
 void Caravan::move(const std::string& direction) {
+    if (type == "Military") {
+        lastDirection = direction;
+    }
 
     if (type == "Secret" && isCurrentlyInvisible()) {
         std::cout << "[Erro] Caravana Secreta esta invisivel e nao pode mover-se!" << std::endl;
@@ -70,27 +73,25 @@ void Caravan::move(const std::string& direction) {
 
 // Processa consumo de água e inatividade
 bool Caravan::processMovement(Map& map) {
-    int waterConsumption = consumeWater();
+    if (crew == 0) {
+        // Permite movimento para caravanas sem tripulantes
+        return true;
+    }
 
+    int waterConsumption = consumeWater();
     if (water >= waterConsumption) {
         water -= waterConsumption;
-        return true; // Movimento permitido, água suficiente
+        return true;
     }
 
-    // Se a água chegou a zero, verifica se é uma Caravana Secreta
-    if (water <= 0) {
-        if (type == "Secret") {
-            becomeObstacle(map); // Torna-se um obstáculo no mapa
-            return false; // Não pode mais se mover
-        }
+    if (type == "Secret" && water <= 0) {
+        becomeObstacle(map); // Torna-se obstáculo
+        return false;
     }
 
-    // Caso contrário, perde tripulantes apenas para outras caravanas
     loseCrew(1);
-
-    return isActive(); // Movimento permitido apenas se ainda estiver ativa
+    return isActive();
 }
-
 
 
 // Exibe o status básico
@@ -107,7 +108,7 @@ void Caravan::status() const {
 TradeCaravan::TradeCaravan(int id, int initialCrew)
     : Caravan(id, "Trade") {
     maxCargo = 5;       // Capacidade máxima de carga para TradeCaravan
-    maxWater = 400;      // Capacidade máxima de água
+    maxWater = 5;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;
     cargo = 2;// Número inicial de tripulantes
@@ -134,7 +135,7 @@ void TradeCaravan::move(const std::string& direction) {
 MilitaryCaravan::MilitaryCaravan(int id, int initialCrew)
     : Caravan(id, "Military") {
     maxCargo = 5;        // Capacidade máxima de carga para MilitaryCaravan
-    maxWater = 400;      // Capacidade máxima de água
+    maxWater = 2;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;
     cargo = 3;// Número inicial de tripulantes
@@ -143,7 +144,7 @@ MilitaryCaravan::MilitaryCaravan(int id, int initialCrew)
 SecretCaravan::SecretCaravan(int id, int initialCrew)
     : Caravan(id, "Secret") {
     maxCargo = 5;        // Capacidade máxima de carga para MilitaryCaravan
-    maxWater = 400;      // Capacidade máxima de água
+    maxWater = 5;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;
     cargo = 3;// Número inicial de tripulantes
@@ -222,3 +223,66 @@ void Caravan::updateInvisibility() {
         }
     }
 }
+
+// Caravan.cpp
+
+void Caravan::moveRandomly(Map& map) {
+    std::vector<std::string> directions = {"C", "B", "D", "E", "CE", "CD", "BE", "BD"};
+    std::string randomDirection = directions[rand() % directions.size()];
+    int oldRow = row;
+    int oldCol = col;
+
+    move(randomDirection); // Movimento da caravana
+
+    auto [newRow, newCol] = map.wrapCoordinates(row, col);
+
+    if (map.getCell(newRow, newCol) == '.') {
+        map.setCell(oldRow, oldCol, '.'); // Limpa a posição anterior
+        map.setCell(newRow, newCol, '0' + id); // Atualiza para nova posição
+        row = newRow;
+        col = newCol;
+
+        std::cout << "[TradeCaravan] ID: " << id << " moveu-se aleatoriamente para ("
+                  << newRow << ", " << newCol << ")." << std::endl;
+    } else {
+        row = oldRow;
+        col = oldCol;
+        std::cout << "[TradeCaravan] ID: " << id
+                  << " não conseguiu mover-se aleatoriamente devido a um obstáculo." << std::endl;
+    }
+}
+
+void Caravan::moveInLastDirection(Map& map) {
+    if (!lastDirection.empty()) {
+        int oldRow = row;
+        int oldCol = col;
+
+        // Executa o movimento na última direção conhecida
+        move(lastDirection);
+
+        auto [newRow, newCol] = map.wrapCoordinates(row, col);
+
+        // Verifica se o destino está livre
+        if (map.getCell(newRow, newCol) == '.') {
+            map.setCell(oldRow, oldCol, '.'); // Limpa a posição anterior
+            map.setCell(newRow, newCol, '0' + id); // Atualiza para nova posição
+            row = newRow;
+            col = newCol;
+
+            std::cout << "[MilitaryCaravan] ID: " << id
+                      << " moveu-se na última direção conhecida para ("
+                      << newRow << ", " << newCol << ")." << std::endl;
+        } else {
+            // Se a célula estiver ocupada, restaura a posição original
+            row = oldRow;
+            col = oldCol;
+            std::cout << "[MilitaryCaravan] ID: " << id
+                      << " não conseguiu mover-se devido a um obstáculo." << std::endl;
+        }
+    } else {
+        std::cout << "[MilitaryCaravan] ID: " << id
+                  << " não tem uma última direção válida para se mover." << std::endl;
+    }
+}
+
+

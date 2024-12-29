@@ -2,6 +2,8 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+
+#include "BarbarianCaravan.h"
 #include "Wallet.h"
 #include "Map.h"
 #include "Commands.h"
@@ -90,6 +92,7 @@ void Simulator::run() {
      << "  areia <l> <c> <r> - Cria uma tempestade de areia em (l,c) com raio r\n"
      << "  moedas <N>        - Acrescenta N moedas ao jogador (pode ser negativo)\n"
      << "  tripul <N> <T>    - Adiciona T tripulantes a caravana N (na cidade)\n"
+     << "  invisible <N>      - Modo invisivel para a caravana N secreta\n"
      //<< "  saves <nome>      - Guarda o estado atual do buffer com o nome dado\n"
     // << "  loads <nome>      - Carrega um estado anteriormente guardado\n"
     // << "  lists             - Lista os nomes dos estados guardados\n"
@@ -156,25 +159,29 @@ void Simulator::advanceSimulation(int n) {
         std::cout << "Simulacao avancando instante " << (i + 1) << " de " << n << "." << std::endl;
 
         for (auto& caravan : caravans) {
+            // 1️⃣ Primeiro, tratar caravanas sem tripulação
+            if (!caravan->isActive()) {
+                handleCaravanWithoutCrew(caravan); // Tratar caravanas sem tripulação
+                continue; // Evita que esta caravana continue nas verificações seguintes
+            }
+
+            // 2️⃣ Atualizar invisibilidade das caravanas secretas
             if (caravan->getType() == "Secret") {
                 caravan->updateInvisibility();
             }
 
+            // 3️⃣ Lógica para caravanas automáticas
             if (caravan->isAuto()) {
-                if (caravan->isActive()) {
-                    if (caravan->getType() == "Trade") {
-                        handleTradeCaravanAuto(caravan);
-                    } else if (caravan->getType() == "Military") {
-                        handleMilitaryCaravanAuto(caravan);
-                    }
-                } else {
-                    if (caravan->getType() == "Secret" && caravan->getWater() <= 0) {
-                        caravan->becomeObstacle(map);
-                        removeCaravan(caravan);
-                        continue;
-                    }
-                    handleCaravanWithoutCrew(caravan);
+                if (caravan->getType() == "Trade") {
+                    handleTradeCaravanAuto(caravan);
+                } else if (caravan->getType() == "Military") {
+                    handleMilitaryCaravanAuto(caravan);
                 }
+            }
+
+            // 4️⃣ Tratar caravanas bárbaras
+            if (caravan->getType() == "Barbarian") {
+                handleBarbarianCaravanAuto(static_cast<BarbarianCaravan*>(caravan));
             }
         }
 
@@ -189,6 +196,10 @@ void Simulator::advanceSimulation(int n) {
             spawnItem(); // Gera novos itens de acordo com o tempo configurado
         }
 
+        if (elapsedInstants % timeBetweenBarbarians == 0) {
+            spawnBarbarianCaravan(); // Usa o intervalo configurado no ficheiro
+        }
+
         // Verificação automática
         if (shouldEndSimulation()) {
             endSimulation();
@@ -196,6 +207,7 @@ void Simulator::advanceSimulation(int n) {
         }
     }
 }
+
 
 void Simulator::showPrices() const {
     cout << "Precos das mercadorias nas cidades (T):" << endl;

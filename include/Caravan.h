@@ -24,6 +24,7 @@ protected:
     bool owned = false;
     bool isInvisible = false; // Estado de invisibilidade
     int invisibleTurns = 0;   // Contador de turnos de invisibilidade
+    std::string lastDirection;
 
 public:
     // Construtor
@@ -129,6 +130,11 @@ public:
     void activateInvisibility(); // Ativa o modo invisível
     void updateInvisibility();   // Atualiza a duração da invisibilidade
     bool isCurrentlyInvisible() const { return isInvisible; }
+
+    void setLastDirection(const std::string& direction) { lastDirection = direction; }
+    std::string getLastDirection() const { return lastDirection; }
+    void moveRandomly(Map& map);
+    void moveInLastDirection(Map& map);
 
     virtual ~Caravan() = default;
 

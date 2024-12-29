@@ -4,6 +4,8 @@
 #include "Caravan.h"
 
 class BarbarianCaravan : public Caravan {
+private:
+    int spawnTurn = 0;
 public:
     BarbarianCaravan(int id)
         : Caravan(id, "Barbarian", 0, 0) { // Sem capacidade de carga e água
@@ -28,6 +30,16 @@ public:
     int getMaxMovesPerTurn() const override {
         return 1; // Bárbaros podem se mover 1 vez por turno
     }
+
+    void setSpawnTurn(int turn) {
+        if (turn >= 0) {
+            spawnTurn = turn;
+        } else {
+            cout << "[Erro] Turno de spawn inválido para a caravana bárbara." << endl;
+        }
+    }
+
+    int getSpawnTurn() const { return spawnTurn; }
 };
 
 #endif
