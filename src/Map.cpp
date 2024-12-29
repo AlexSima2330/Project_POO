@@ -10,26 +10,23 @@ Map::Map(int rows, int cols) : rows(rows), cols(cols), grid(rows, vector<char>(c
 
 // Método para coordenadas espiral
 pair<int, int> Map::wrapCoordinates(int row, int col) const {
+    // Ajuste de colunas (mantendo a linha intacta)
     if (col >= cols) {
-        // Saiu pela direita, move para a próxima linha, coluna inicial
-        row = (row + 1) % rows;
-        col = 0;
+        col = 0; // Volta para a primeira coluna
     } else if (col < 0) {
-        // Saiu pela esquerda, move para a linha anterior, última coluna
-        row = (row - 1 + rows) % rows;
-        col = cols - 1;
+        col = cols - 1; // Vai para a última coluna
     }
 
+    // Ajuste de linhas (mantendo a coluna intacta)
     if (row >= rows) {
-        // Saiu pela última linha (indo para baixo), volta à primeira
-        row = 0;
+        row = 0; // Volta para a primeira linha
     } else if (row < 0) {
-        // Saiu pela primeira linha (indo para cima), volta à última
-        row = rows - 1;
+        row = rows - 1; // Vai para a última linha
     }
 
     return {row, col};
 }
+
 
 // Função para carregar o mapa de um ficheiro
 bool Map::loadFromFile(const string& filename) {
