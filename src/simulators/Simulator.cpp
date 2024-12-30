@@ -277,7 +277,7 @@ void Simulator::spawnItem() {
 
         items.push_back(new Item(type, row, col, duration));
         map.setCell(row, col, 'I'); // Representação visual do item
-        std::cout << "[Item] Novo item apareceu em (" << row << ", " << col << "\n";
+        std::cout << "[Item] Novo item apareceu em (" << row << ", " << col << ")" << "\n";
     }
 }
 

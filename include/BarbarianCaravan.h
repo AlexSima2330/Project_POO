@@ -8,13 +8,13 @@ private:
     int spawnTurn = 0;
 public:
     BarbarianCaravan(int id)
-        : Caravan(id, "Barbarian", 0, 0) { // Sem capacidade de carga e água
-        crew = 40; // 40 bárbaros armados
+        : Caravan(id, "Barbarian", 0, 0) {
+        crew = 40;
     }
 
     void move(const std::string& direction) override {
         cout << "[BarbarianCaravan] ID: " << id << " moveu-se na direção " << direction << "." << endl;
-        Caravan::move(direction); // Movimento básico herdado
+        Caravan::move(direction);
     }
 
     void status() const override {
@@ -24,11 +24,11 @@ public:
     }
 
     int consumeWater() const override {
-        return 0; // Bárbaros não consomem água
+        return 0;
     }
 
     int getMaxMovesPerTurn() const override {
-        return 1; // Bárbaros podem se mover 1 vez por turno
+        return 1;
     }
 
     void setSpawnTurn(int turn) {

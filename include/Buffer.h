@@ -4,7 +4,7 @@
 class Buffer {
 private:
     int rows, cols;
-    char** screen; // Apontador para um array bidimensional
+    char** screen; // array bidimensional
     int cursorRow, cursorCol;
 
 public:

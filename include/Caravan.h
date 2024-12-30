@@ -2,7 +2,6 @@
 #define CARAVAN_H
 
 #include <string>
-#include <iostream>
 #include "Map.h" // Inclui para manipular o mapa diretamente
 
 class Map;

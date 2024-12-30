@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <string>
-#include <iostream>
 #include "City.h"
 
 using namespace std;
@@ -14,8 +13,9 @@ class Map {
 private:
     int rows;
     int cols;
-    vector<std::vector<char>> grid;
+    vector<char> grid;
     vector<City> cities; // Vetor de cidades no mapa
+    int index(int row, int col) const;
 
 public:
     Map(int rows, int cols);
