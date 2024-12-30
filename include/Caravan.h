@@ -74,7 +74,6 @@ public:
         if (crew > 0) {
             crew -= amount;
             if (crew < 0) crew = 0; // Evita números negativos
-            std::cout << "[Caravana] ID: " << id << " perdeu " << amount << " tripulantes. Restantes: " << crew << std::endl;
         }
     }
 

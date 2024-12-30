@@ -3,18 +3,43 @@
 
 using namespace std;
 
-void Simulator::saveBufferState(const std::string &nome) {
-    cout << "Guardar estado do buffer com nome " << nome << " (não implementado)." << endl;
+// Guarda o estado atual do buffer com um nome
+void Simulator::saveBufferState(const std::string& name) {
+    savedBuffers[name] = buffer; // Copia o estado atual do buffer
+    std::cout << "Estado do buffer guardado como '" << name << "'." << std::endl;
 }
 
-void Simulator::loadBufferState(const std::string &nome) {
-    cout << "Carregar estado do buffer com nome " << nome << " (não implementado)." << endl;
+// Carrega um estado previamente guardado
+void Simulator::loadBufferState(const std::string& name) {
+    auto it = savedBuffers.find(name);
+    if (it != savedBuffers.end()) {
+        buffer = it->second; // Restaura o estado do buffer
+        buffer.printToConsole();
+        std::cout << "Estado do buffer '" << name << "' carregado." << std::endl;
+    } else {
+        std::cout << "Erro: Nenhum estado guardado com o nome '" << name << "'." << std::endl;
+    }
 }
 
+// Lista todos os nomes dos estados guardados
 void Simulator::listSavedStates() const {
-    cout << "Listar estados guardados (não implementado)." << endl;
+    if (savedBuffers.empty()) {
+        std::cout << "Nenhum estado do buffer guardado." << std::endl;
+    } else {
+        std::cout << "Estados guardados:" << std::endl;
+        for (const auto& pair : savedBuffers) {
+            std::cout << "- " << pair.first << std::endl;
+        }
+    }
 }
 
-void Simulator::deleteSavedState(const std::string &nome) {
-    cout << "Apagar estado guardado " << nome << " (não implementado)." << endl;
+// Apaga um estado guardado
+void Simulator::deleteSavedState(const std::string& name) {
+    auto it = savedBuffers.find(name);
+    if (it != savedBuffers.end()) {
+        savedBuffers.erase(it);
+        std::cout << "Estado do buffer '" << name << "' apagado." << std::endl;
+    } else {
+        std::cout << "Erro: Nenhum estado guardado com o nome '" << name << "'." << std::endl;
+    }
 }

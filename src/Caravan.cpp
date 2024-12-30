@@ -111,7 +111,7 @@ TradeCaravan::TradeCaravan(int id, int initialCrew)
     maxWater = 200;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;
-    cargo = 20;// Número inicial de tripulantes
+    cargo = 0;// Número inicial de tripulantes
 }
 
 int TradeCaravan::consumeWater() const {
@@ -138,7 +138,7 @@ MilitaryCaravan::MilitaryCaravan(int id, int initialCrew)
     maxWater = 400;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;
-    cargo = 40;// Número inicial de tripulantes
+    cargo = 0;// Número inicial de tripulantes
 }
 
 SecretCaravan::SecretCaravan(int id, int initialCrew)
@@ -147,7 +147,7 @@ SecretCaravan::SecretCaravan(int id, int initialCrew)
     maxWater = 250;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;
-    cargo = 25;// Número inicial de tripulantes
+    cargo = 0;// Número inicial de tripulantes
 }
 
 int SecretCaravan::consumeWater() const {

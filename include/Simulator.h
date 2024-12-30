@@ -11,6 +11,8 @@
 #include "Item.h"
 #include "Wallet.h"
 
+class Buffer;
+
 class Simulator {
 private:
     Map map; // Objeto do tipo Map
@@ -22,13 +24,14 @@ private:
     int elapsedInstants = 0; // Contador de instantes
     int totalCombatsWon = 0; // Contador de combates vencidos
     std::vector<Caravan*> simulatorCaravans;
-    bool shouldEndSimulation();
     std::vector<Item*> items; // Vetor para armazenar itens no mapa
     int itemDuration;          // Duração dos itens no mapa
     int maxItems;              // Número máximo de itens simultâneos
     int timeBetweenItems;      // Intervalo entre novos itens
     int timeBetweenBarbarians; // Intervalo padrão
     int barbarianDuration;
+    bool shouldEndSimulation();
+    std::unordered_map<std::string, Buffer> savedBuffers;
 
 public:
     Simulator();
@@ -101,6 +104,8 @@ public:
     // Comportamento das Caravanas Bárbaras
     void handleBarbarianCaravanAuto(BarbarianCaravan* caravan);
     void spawnBarbarianCaravan();
+
+    void resolveCombats();
 
     void endSimulation();
 };

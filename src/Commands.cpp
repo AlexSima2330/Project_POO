@@ -133,6 +133,20 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         std::istringstream iss(command);
         std::string cmd, nome; iss >> cmd >> nome;
         sim.deleteSavedState(nome);
+    }else if (command.find("saves") == 0) {
+        std::istringstream iss(command);
+        std::string cmd, nome; iss >> cmd >> nome;
+        sim.saveBufferState(nome);
+    } else if (command.find("loads") == 0) {
+        std::istringstream iss(command);
+        std::string cmd, nome; iss >> cmd >> nome;
+        sim.loadBufferState(nome);
+    } else if (command == "lists") {
+        sim.listSavedStates();
+    } else if (command.find("dels") == 0) {
+        std::istringstream iss(command);
+        std::string cmd, nome; iss >> cmd >> nome;
+        sim.deleteSavedState(nome);
     } else if (command == "terminar") {
         sim.endSimulation();
         std::cout << "A simulacao terminou. Voltando a fase 1..." << std::endl;

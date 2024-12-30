@@ -2,6 +2,9 @@
 #include <iostream>
 #include <cstdio>
 
+Buffer::Buffer() : rows(0), cols(0), cursorRow(0), cursorCol(0), screen(nullptr) {}
+
+
 Buffer::Buffer(int rows, int cols) : rows(rows), cols(cols), cursorRow(0), cursorCol(0) {
     screen = new char*[rows];
     for (int i = 0; i < rows; i++) {

@@ -3,6 +3,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include "Fight.h"
+
 using namespace std;
 
 void Simulator::addCaravan(Caravan* caravan, int row, int col) {
@@ -628,8 +630,8 @@ void Simulator::handleBarbarianCaravanAuto(BarbarianCaravan* caravan) {
     // 🕒 **Desaparecimento após `barbarianDuration` turnos**
     if (elapsedInstants - caravan->getSpawnTurn() >= barbarianDuration) {
         removeCaravan(caravan);
-        std::cout << "[BarbarianCaravan] ID: " << caravan->getId()
-                  << " desapareceu após " << barbarianDuration << " turnos." << std::endl;
+        std::cout << "[BarbarianCaravan] " << caravan->getId()
+                  << " desapareceu apos " << barbarianDuration << " turnos." << std::endl;
     }
 }
 

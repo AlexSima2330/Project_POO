@@ -8,6 +8,7 @@ private:
     int cursorRow, cursorCol;
 
 public:
+    Buffer(); // Construtor padrão
     Buffer(int rows, int cols);
     Buffer(const Buffer &other);            // Construtor de cópia
     Buffer& operator=(const Buffer &other);

@@ -7,6 +7,7 @@
 #include "Wallet.h"
 #include "Map.h"
 #include "Commands.h"
+#include "Fight.h"
 #include "Item.h"
 
 using namespace std;
@@ -93,10 +94,10 @@ void Simulator::run() {
      << "  moedas <N>        - Acrescenta N moedas ao jogador (pode ser negativo)\n"
      << "  tripul <N> <T>    - Adiciona T tripulantes a caravana N (na cidade)\n"
      << "  invisible <N>      - Modo invisivel para a caravana N secreta\n"
-     //<< "  saves <nome>      - Guarda o estado atual do buffer com o nome dado\n"
-    // << "  loads <nome>      - Carrega um estado anteriormente guardado\n"
-    // << "  lists             - Lista os nomes dos estados guardados\n"
-   //  << "  dels <nome>       - Apaga um estado guardado pelo nome\n"
+     << "  saves <nome>      - Guarda o estado atual do buffer com o nome dado\n"
+     << "  loads <nome>      - Carrega um estado anteriormente guardado\n"
+     << "  lists             - Lista os nomes dos estados guardados\n"
+     << "  dels <nome>       - Apaga um estado guardado pelo nome\n"
      << "Digite o comando: ";
 
             if (!getline(cin, command)) {
@@ -202,6 +203,8 @@ void Simulator::advanceSimulation(int n) {
             spawnBarbarianCaravan(); // Usa o intervalo configurado no ficheiro
         }
 
+        resolveCombats();
+
         // Verificação automática
         if (shouldEndSimulation()) {
             endSimulation();
@@ -212,9 +215,10 @@ void Simulator::advanceSimulation(int n) {
 
 
 void Simulator::showPrices() const {
-    cout << "Precos das mercadorias nas cidades (T):" << endl;
-    cout << " - Preco de compra: 1 moeda por tonelada" << endl;
-    cout << " - Preco de venda: 2 moedas por tonelada" << endl;
+    cout << "Precos nas cidades (T):" << endl;
+    cout << "preco_compra_mercadoria 1" << endl;
+    cout << "preco_venda_mercadoria 2" << endl;
+    cout << "preco_caravana 100" << endl;
 }
 
 void Simulator::addCoins(int n) {
@@ -353,4 +357,28 @@ void Simulator::removeCaravanMine(Caravan* caravan) {
     }
 
     std::cout << "[Erro] Tentativa de remover uma caravana que não existe.\n";
+}
+
+void Simulator::resolveCombats() {
+    for (auto& caravan : caravans) {
+        if (!caravan->isActive()) continue; // Ignorar caravanas inativas
+
+        for (auto& other : caravans) {
+            if (caravan == other || !other->isActive()) continue;
+
+            // Verificar se são caravanas adjacentes (acima, abaixo, esquerda, direita)
+            bool isAdjacent =
+                (std::abs(caravan->getRow() - other->getRow()) == 1 && caravan->getCol() == other->getCol()) ||
+                (std::abs(caravan->getCol() - other->getCol()) == 1 && caravan->getRow() == other->getRow());
+
+            if (isAdjacent) {
+                if (caravan->isOwned() && other->getType() == "Barbarian") {
+                    std::cout << "[Combate] Caravana ID " << caravan->getId()
+                              << " encontrou uma caravana barbara !" << std::endl;
+
+                    Fight::handleCombat(caravan, other, this);
+                }
+            }
+        }
+    }
 }

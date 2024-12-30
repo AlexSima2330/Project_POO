@@ -84,17 +84,17 @@ std::vector<Caravan*>& City::getCaravans() {
 
 void City::initializeCaravans(int& globalCaravanID) {
     // Adiciona uma caravana de cada tipo com IDs únicos
-    TradeCaravan* trade = new TradeCaravan(globalCaravanID++, 3);
+    TradeCaravan* trade = new TradeCaravan(globalCaravanID++, 20);
     trade->setPosition(row, col);
     trade->setInCity(true);
     addCaravan(trade);
 
-    MilitaryCaravan* military = new MilitaryCaravan(globalCaravanID++, 3);
+    MilitaryCaravan* military = new MilitaryCaravan(globalCaravanID++, 40);
     military->setPosition(row, col);
     military->setInCity(true);
     addCaravan(military);
 
-    SecretCaravan* secret = new SecretCaravan(globalCaravanID++, 30);
+    SecretCaravan* secret = new SecretCaravan(globalCaravanID++, 25);
     secret->setPosition(row, col);
     secret->setInCity(true);
     addCaravan(secret);

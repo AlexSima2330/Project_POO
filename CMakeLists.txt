@@ -24,6 +24,8 @@ set(SOURCE_FILES
         include/BarbarianCaravan.h
         include/Item.h
         src/Item.cpp
+        src/Fight.cpp
+        include/Fight.h
 )
 
 add_executable(Project_POO ${SOURCE_FILES})
