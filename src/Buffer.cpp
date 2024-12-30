@@ -4,7 +4,6 @@
 
 Buffer::Buffer() : rows(0), cols(0), cursorRow(0), cursorCol(0), screen(nullptr) {}
 
-
 Buffer::Buffer(int rows, int cols) : rows(rows), cols(cols), cursorRow(0), cursorCol(0) {
     screen = new char*[rows];
     for (int i = 0; i < rows; i++) {
@@ -16,33 +15,29 @@ Buffer::Buffer(int rows, int cols) : rows(rows), cols(cols), cursorRow(0), curso
 }
 
 Buffer::Buffer(const Buffer &other) : rows(other.rows), cols(other.cols), cursorRow(other.cursorRow), cursorCol(other.cursorCol) {
-    // Alocar nova memória
     screen = new char*[rows];
     for (int i = 0; i < rows; i++) {
         screen[i] = new char[cols];
         for (int j = 0; j < cols; j++) {
-            screen[i][j] = other.screen[i][j]; // Copiar cada caracter
+            screen[i][j] = other.screen[i][j];
         }
     }
 }
 
 Buffer& Buffer::operator=(const Buffer &other) {
-    if (this == &other) // Previne auto-atribuição
+    if (this == &other)
         return *this;
 
-    // Libertar memória atual
     for (int i = 0; i < rows; i++) {
         delete[] screen[i];
     }
     delete[] screen;
 
-    // Copiar dimensões e cursor
     rows = other.rows;
     cols = other.cols;
     cursorRow = other.cursorRow;
     cursorCol = other.cursorCol;
 
-    // Alocar nova memória e copiar dados
     screen = new char*[rows];
     for (int i = 0; i < rows; i++) {
         screen[i] = new char[cols];
@@ -76,7 +71,7 @@ void Buffer::printToConsole() const {
         for (int j = 0; j < cols; j++) {
             std::cout << screen[i][j];
         }
-        std::cout << std::endl; // Salto de linha após cada linha do buffer
+        std::cout << std::endl;
     }
 }
 
@@ -95,7 +90,7 @@ void Buffer::putChar(char c) {
             cursorCol = 0;
             cursorRow++;
             if (cursorRow >= rows) {
-                cursorRow = 0; // Volta ao início em caso de overflow
+                cursorRow = 0;
             }
         }
     }
@@ -107,13 +102,11 @@ void Buffer::putString(const char *str) {
     }
 }
 
-// Operador << para C-strings
 Buffer& operator<<(Buffer &buffer, const char *str) {
     buffer.putString(str);
     return buffer;
 }
 
-// Operador << para inteiros
 Buffer& operator<<(Buffer &buffer, int num) {
     char tmp[64];
     std::snprintf(tmp, sizeof(tmp), "%d", num);
@@ -121,7 +114,6 @@ Buffer& operator<<(Buffer &buffer, int num) {
     return buffer;
 }
 
-// Operador << para caracteres
 Buffer& operator<<(Buffer &buffer, char c) {
     buffer.putChar(c);
     return buffer;

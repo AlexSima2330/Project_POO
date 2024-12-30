@@ -12,7 +12,7 @@
 
 using namespace std;
 
-Simulator::Simulator() : map(0, 0), bufferRows(0), bufferCols(0), buffer(0, 0), wallet(0) {
+Simulator::Simulator() : map(0, 0),  bufferRows(0), bufferCols(0), buffer(0, 0), wallet(0) {
     cout << "Mapa criado com sucesso!" << endl;
 }
 
@@ -36,9 +36,7 @@ void Simulator::run() {
                 if (!filename.empty()) {
                     if (loadMap(filename)) {
                         cout << "Mapa carregado com sucesso do ficheiro: " << filename << endl;
-                        initializeCityCaravans(); // Inicializa caravanas nas cidades
-                        mapLoaded = true;
-                        // Adicionar caravanas aqui, após o mapa ser carregado
+                        initializeCityCaravans();
                         //Caravan* trade = new TradeCaravan(1, 5);
                         //trade->setPosition(2, 7);
                         //addCaravan(trade, 2, 7);
@@ -61,7 +59,7 @@ void Simulator::run() {
                 }
             } else if (command == "sair") {
                 cout << "Simulacao terminada." << endl;
-                return; // Sai do run, termina o programa
+                return;
             } else {
                cerr << "Comando invalido nesta fase. Use 'config <ficheiro>' ou 'sair'." << endl;
             }
@@ -73,7 +71,7 @@ void Simulator::run() {
 
             if (shouldEndSimulation()) {
                 endSimulation();
-                return; // Sai completamente da simulação
+                return;
             }
 
             cout << "Digite um comando ou 'terminar' para voltar a fase 1.\n"
@@ -101,7 +99,7 @@ void Simulator::run() {
      << "Digite o comando: ";
 
             if (!getline(cin, command)) {
-                return; // se EOF, sai do programa
+                return;
             }
 
             if (command.find("exec") == 0) {
@@ -110,10 +108,9 @@ void Simulator::run() {
                 iss >> cmd >> filename;
 
                 if (filename.empty()) {
-                    filename = "run_commands.txt"; // Nome padrão
+                    filename = "run_commands.txt";
                 }
 
-                // Caminho do ficheiro na pasta "config"
                 std::string filepath = "./config/" + filename;
 
                 ifstream file(filepath);
@@ -123,7 +120,7 @@ void Simulator::run() {
                     std::cout << "A executar comandos do ficheiro: " << filepath << std::endl;
                     string line;
                     while (getline(file, line)) {
-                        processPhase2Command(*this, line); // Executa cada comando do ficheiro
+                        processPhase2Command(*this, line);
                         checkAndEndSimulation();
                     }
                 }
@@ -131,7 +128,7 @@ void Simulator::run() {
                 processPhase2Command(*this, command);
                 checkAndEndSimulation();
                 if (command == "terminar") {
-                    break; // Garante que saímos corretamente do loop
+                    break;
                 }
             }
         }
@@ -139,10 +136,10 @@ void Simulator::run() {
 }
 
 void Simulator::initializeCityCaravans() {
-    int globalCaravanID = 1; // ID único para todas as caravanas
+    int globalCaravanID = 1;
 
     for (auto& city : map.getCities()) {
-        city.initializeCaravans(globalCaravanID); // Passa o contador global
+        city.initializeCaravans(globalCaravanID);
     }
 }
 
@@ -160,18 +157,15 @@ void Simulator::advanceSimulation(int n) {
         std::cout << "Simulacao avancando instante " << (i + 1) << " de " << n << "." << std::endl;
 
         for (auto& caravan : caravans) {
-            // 1️⃣ Primeiro, tratar caravanas sem tripulação
             if (!caravan->isActive()) {
-                handleCaravanWithoutCrew(caravan); // Tratar caravanas sem tripulação
-                continue; // Evita que esta caravana continue nas verificações seguintes
+                handleCaravanWithoutCrew(caravan);
+                continue;
             }
 
-            // 2️⃣ Atualizar invisibilidade das caravanas secretas
             if (caravan->getType() == "Secret") {
                 caravan->updateInvisibility();
             }
 
-            // 3️⃣ Lógica para caravanas automáticas
             if (caravan->isAuto()) {
                 if (caravan->getType() == "Trade") {
                     handleTradeCaravanAuto(caravan);
@@ -182,37 +176,33 @@ void Simulator::advanceSimulation(int n) {
                 }
             }
 
-            // 4️⃣ Tratar caravanas bárbaras
             if (caravan->getType() == "Barbarian") {
                 handleBarbarianCaravanAuto(static_cast<BarbarianCaravan*>(caravan));
             }
         }
 
-        // 🛠️ Atualiza e verifica interações com itens
         for (auto& caravan : caravans) {
-            checkCaravanForItem(caravan); // Verifica se a caravana apanha algum item
+            checkCaravanForItem(caravan);
         }
 
-        updateItems(); // Atualiza a duração dos itens
+        updateItems();
 
         if (elapsedInstants % timeBetweenItems == 0) {
-            spawnItem(); // Gera novos itens de acordo com o tempo configurado
+            spawnItem();
         }
 
         if (elapsedInstants % timeBetweenBarbarians == 0) {
-            spawnBarbarianCaravan(); // Usa o intervalo configurado no ficheiro
+            spawnBarbarianCaravan();
         }
 
         resolveCombats();
 
-        // Verificação automática
         if (shouldEndSimulation()) {
             endSimulation();
-            return; // Sai imediatamente da simulação
+            return;
         }
     }
 }
-
 
 void Simulator::showPrices() const {
     cout << "Precos nas cidades (T):" << endl;
@@ -222,7 +212,7 @@ void Simulator::showPrices() const {
 }
 
 void Simulator::addCoins(int n) {
-    wallet.addCoins(n); // Usa a funcionalidade da Wallet
+    wallet.addCoins(n);
     cout << "Moedas atualizadas. Novo saldo: " << wallet.getCoins() << endl;
 }
 
@@ -239,10 +229,10 @@ bool Simulator::shouldEndSimulation() {
     bool insufficientFunds = wallet.getCoins() < 100;
     bool noAvailableCaravansInCities = true;
 
-    // Verifica se existem caravanas disponíveis nas cidades
+    // Verifica as caravanas existentes nas cidades
     for (const auto& city : map.getCities()) {
         for (const auto& caravan : city.getCaravans()) {
-            if (!caravan->isOwned() && wallet.getCoins() >= 100) { // Se houver caravanas não compradas e dinheiro suficiente
+            if (!caravan->isOwned() && wallet.getCoins() >= 100) {
                 noAvailableCaravansInCities = false;
                 break;
             }
@@ -259,24 +249,23 @@ void Simulator::checkAndEndSimulation() {
     if (shouldEndSimulation()) {
         std::cout << "\nMeios insuficientes para continuar...\n";
         endSimulation();
-        exit(0); // Sai imediatamente
+        exit(0);
     }
 }
 
 void Simulator::spawnItem() {
-    if (items.size() >= maxItems) return; // Máximo de itens já atingido
+    if (items.size() >= maxItems) return;
 
     int row = rand() % map.getRows();
     int col = rand() % map.getCols();
 
-    if (map.getCell(row, col) == '.') { // Apenas em células vazias
-        ItemType type = static_cast<ItemType>(rand() % 5); // Sorteia tipo aleatório
+    if (map.getCell(row, col) == '.') {
+        ItemType type = static_cast<ItemType>(rand() % 5);
 
-        // Usa o valor configurado para a duração
         int duration = itemDuration;
 
         items.push_back(new Item(type, row, col, duration));
-        map.setCell(row, col, 'I'); // Representação visual do item
+        map.setCell(row, col, 'I');
         std::cout << "[Item] Novo item apareceu em (" << row << ", " << col << ")" << "\n";
     }
 }
@@ -286,7 +275,7 @@ void Simulator::updateItems() {
         (*it)->decreaseLifetime();
 
         if ((*it)->isExpired()) {
-            map.setCell((*it)->getRow(), (*it)->getCol(), '.'); // Remove do mapa
+            map.setCell((*it)->getRow(), (*it)->getCol(), '.');
             delete *it;
             it = items.erase(it);
         } else {
@@ -298,12 +287,11 @@ void Simulator::checkCaravanForItem(Caravan* caravan) {
     int row = caravan->getRow();
     int col = caravan->getCol();
 
-    // Coordenadas adjacentes (Cima, Baixo, Esquerda, Direita)
     std::vector<std::pair<int, int>> adjacentPositions = {
-        {row - 1, col}, // Cima
-        {row + 1, col}, // Baixo
-        {row, col - 1}, // Esquerda
-        {row, col + 1}  // Direita
+        {row - 1, col},
+        {row + 1, col},
+        {row, col - 1},
+        {row, col + 1}
     };
 
     for (auto& [adjRow, adjCol] : adjacentPositions) {
@@ -311,20 +299,17 @@ void Simulator::checkCaravanForItem(Caravan* caravan) {
 
         for (auto it = items.begin(); it != items.end(); ++it) {
             if ((*it)->getRow() == wrappedRow && (*it)->getCol() == wrappedCol) {
-                // Aplica o efeito do item passando o simulador
                 (*it)->applyEffect(caravan, this);
 
-                // Remove o item do mapa
                 map.setCell(wrappedRow, wrappedCol, '.');
 
-                // Remove o item da lista
                 delete *it;
                 items.erase(it);
 
                 std::cout << "[Item] Caravana " << caravan->getId()
                           << " apanhou um item na posicao (" << wrappedRow
                           << ", " << wrappedCol << ").\n";
-                return; // Apenas um item pode ser apanhado por vez
+                return;
             }
         }
     }
@@ -344,29 +329,26 @@ void Simulator::removeCaravanMine(Caravan* caravan) {
             int row = caravan->getRow();
             int col = caravan->getCol();
 
-            // Limpa a célula no mapa
             map.setCell(row, col, '.');
 
-            // Remove a caravana da lista
-            delete *it; // Liberta a memória
+            delete *it;
             caravans.erase(it);
 
-            std::cout << "[Simulator] Caravana removida da posição (" << row << ", " << col << ").\n";
+            std::cout << "[Simulator] Caravana removida da posicao (" << row << ", " << col << ").\n";
             return;
         }
     }
 
-    std::cout << "[Erro] Tentativa de remover uma caravana que não existe.\n";
+    std::cout << "[Erro] Tentativa de remover uma caravana que nao existe.\n";
 }
 
 void Simulator::resolveCombats() {
     for (auto& caravan : caravans) {
-        if (!caravan->isActive()) continue; // Ignorar caravanas inativas
+        if (!caravan->isActive()) continue;
 
         for (auto& other : caravans) {
             if (caravan == other || !other->isActive()) continue;
 
-            // Verificar se são caravanas adjacentes (acima, abaixo, esquerda, direita)
             bool isAdjacent =
                 (std::abs(caravan->getRow() - other->getRow()) == 1 && caravan->getCol() == other->getCol()) ||
                 (std::abs(caravan->getCol() - other->getCol()) == 1 && caravan->getRow() == other->getRow());

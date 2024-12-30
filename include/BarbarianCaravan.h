@@ -1,6 +1,8 @@
 #ifndef BARBARIAN_CARAVAN_H
 #define BARBARIAN_CARAVAN_H
 
+#include <iostream>
+
 #include "Caravan.h"
 
 class BarbarianCaravan : public Caravan {
@@ -13,14 +15,14 @@ public:
     }
 
     void move(const std::string& direction) override {
-        cout << "[BarbarianCaravan] ID: " << id << " moveu-se na direção " << direction << "." << endl;
+        cout << "[BarbarianCaravan] " << id << " moveu-se na direcao " << direction << "." << endl;
         Caravan::move(direction);
     }
 
     void status() const override {
         cout << "[BarbarianCaravan] ID: " << id
-             << ", Posição: (" << row << ", " << col << ")"
-             << ", Bárbaros: " << crew << endl;
+             << ", Posicao: (" << row << ", " << col << ")"
+             << ", Barbaros: " << crew << endl;
     }
 
     int consumeWater() const override {
@@ -35,7 +37,7 @@ public:
         if (turn >= 0) {
             spawnTurn = turn;
         } else {
-            cout << "[Erro] Turno de spawn inválido para a caravana bárbara." << endl;
+            cout << "[Erro] Turno de spawn invalido para a caravana barbara." << endl;
         }
     }
 

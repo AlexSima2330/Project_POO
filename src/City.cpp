@@ -4,21 +4,16 @@
 
 using namespace std;
 
-// Construtor
 City::City(char name, int row, int col) : name(name), row(row), col(col) {}
 
-// Adicionar uma caravana à cidade
 void City::addCaravan(Caravan* caravan) {
     caravans.push_back(caravan);
 }
 
-// Remover uma caravana da cidade
 void City::removeCaravan(Caravan* caravan) {
     caravans.erase(std::remove(caravans.begin(), caravans.end(), caravan), caravans.end());
 }
 
-
-// Listar todas as caravanas na cidade
 void City::listCaravans() const {
     std::cout << "Caravanas na cidade " << name << ":" << std::endl;
 
@@ -44,7 +39,6 @@ void City::listCaravans() const {
     }
 }
 
-
 void City::sellGoods(Caravan* caravan, int quantity, int pricePerTon) {
     if (caravan->getCargo() < quantity) {
         std::cout << "Erro: Caravana ID " << caravan->getId() << " nao tem mercadoria suficiente para vender." << std::endl;
@@ -67,12 +61,6 @@ void City::buyGoods(Caravan* caravan, int quantity, int pricePerTon) {
               << " toneladas de mercadoria por " << (quantity * pricePerTon) << " moedas." << std::endl;
 }
 
-
-// Recrutar tripulantes para uma caravana
-void City::recruitCrew(Caravan* caravan, int quantity) {
-    // Lógica para recrutar tripulantes
-}
-
 const std::vector<Caravan*>& City::getCaravans() const {
     return caravans;
 }
@@ -83,7 +71,6 @@ std::vector<Caravan*>& City::getCaravans() {
 
 
 void City::initializeCaravans(int& globalCaravanID) {
-    // Adiciona uma caravana de cada tipo com IDs únicos
     TradeCaravan* trade = new TradeCaravan(globalCaravanID++, 20);
     trade->setPosition(row, col);
     trade->setInCity(true);

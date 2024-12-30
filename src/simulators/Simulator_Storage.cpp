@@ -3,13 +3,11 @@
 
 using namespace std;
 
-// Guarda o estado atual do buffer com um nome
 void Simulator::saveBufferState(const std::string& name) {
     savedBuffers[name] = buffer; // Copia o estado atual do buffer
     std::cout << "Estado do buffer guardado como '" << name << "'." << std::endl;
 }
 
-// Carrega um estado previamente guardado
 void Simulator::loadBufferState(const std::string& name) {
     auto it = savedBuffers.find(name);
     if (it != savedBuffers.end()) {
@@ -21,7 +19,6 @@ void Simulator::loadBufferState(const std::string& name) {
     }
 }
 
-// Lista todos os nomes dos estados guardados
 void Simulator::listSavedStates() const {
     if (savedBuffers.empty()) {
         std::cout << "Nenhum estado do buffer guardado." << std::endl;
@@ -33,7 +30,6 @@ void Simulator::listSavedStates() const {
     }
 }
 
-// Apaga um estado guardado
 void Simulator::deleteSavedState(const std::string& name) {
     auto it = savedBuffers.find(name);
     if (it != savedBuffers.end()) {

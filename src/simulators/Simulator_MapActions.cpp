@@ -12,7 +12,6 @@ bool Simulator::loadMap(const std::string& filename) {
         return false;
     }
 
-    // 📊 **Leitura Direta dos Parâmetros Configuráveis**
     int rowsConfig, colsConfig, initialCoins;
     file >> rowsConfig >> colsConfig >> initialCoins >> timeBetweenItems >> itemDuration >> maxItems >> timeBetweenBarbarians >> barbarianDuration;;
 
@@ -30,13 +29,13 @@ bool Simulator::loadMap(const std::string& filename) {
             char cell;
             file >> cell;
             if (cell == '.') {
-                map.setCell(i, j, cell); // Zona vazia
+                map.setCell(i, j, cell);
             } else if (std::islower(cell)) {
-                map.addCity(cell, i, j); // Adiciona cidade
+                map.addCity(cell, i, j);
             } else if (std::isdigit(cell)) {
-                map.setCell(i, j, cell); // Caravanas por ID
+                map.setCell(i, j, cell);
             } else {
-                map.setCell(i, j, cell); // Outros elementos
+                map.setCell(i, j, cell);
             }
         }
     }
@@ -44,7 +43,6 @@ bool Simulator::loadMap(const std::string& filename) {
     file.close();
     return true;
 }
-
 
 void Simulator::displayMap() {
     buffer.clear();
@@ -55,105 +53,90 @@ void Simulator::displayMap() {
     int startRow = (bufferRows > map.getRows()) ? (bufferRows - map.getRows()) / 2 : 0;
     int startCol = (bufferCols > map.getCols()) ? (bufferCols - map.getCols()) / 2 : 0;
 
-    // Remove temporariamente as caravanas secretas invisíveis do mapa
     for (const auto& caravan : caravans) {
         if (caravan->getType() == "Secret" && caravan->isCurrentlyInvisible()) {
-            map.setCell(caravan->getRow(), caravan->getCol(), '.'); // Remove temporariamente do mapa
+            map.setCell(caravan->getRow(), caravan->getCol(), '.');
         }
     }
 
-    // Preenche o buffer com as caravanas, respeitando cidades e invisibilidade
     for (const auto& caravan : caravans) {
         if (caravan->getType() == "Secret" && caravan->isCurrentlyInvisible()) {
-            continue; // Não exibe caravanas invisíveis
+            continue;
         }
 
         int row = caravan->getRow();
         int col = caravan->getCol();
 
-        // Certifica-te de que não sobrescreves cidades
         if (!map.isCity(row, col)) {
             buffer.setCursor(startRow + row, startCol + col);
             buffer.putChar('0' + caravan->getId());
         }
     }
 
-    // Preenche o buffer com os elementos do mapa
     for (int i = 0; i < map.getRows(); ++i) {
         for (int j = 0; j < map.getCols(); ++j) {
             buffer.setCursor(startRow + i, startCol + j);
-            buffer.putChar(map.getCell(i, j)); // Adiciona o conteúdo real da célula do mapa
+            buffer.putChar(map.getCell(i, j));
         }
     }
 
-    // 🛠️ **Adiciona Representação dos Itens**
     for (const auto& item : items) {
         buffer.setCursor(startRow + item->getRow(), startCol + item->getCol());
-        buffer.putChar('I'); // Representa um item no mapa
+        buffer.putChar('I');
     }
 
     for (const auto& caravan : caravans) {
         if (caravan->getType() == "Secret" && caravan->isCurrentlyInvisible()) {
-            map.setCell(caravan->getRow(), caravan->getCol(), '0' + caravan->getId()); // Restaura no mapa
+            map.setCell(caravan->getRow(), caravan->getCol(), '0' + caravan->getId());
         }
     }
 
-    // Exibe o conteúdo do buffer no terminal
     buffer.printToConsole();
 
-    // Exibe moedas iniciais
     cout << "moedas " << wallet.getCoins() << endl;
     cout << "instantes_entre_novos_itens " << timeBetweenItems << endl;
     cout << "duracao_item " << itemDuration << endl;
     cout << "max_itens " << maxItems << endl;
-    //cout << "preço_venda_mercadoria " << wallet.getCoins() << std::endl;
-   // cout << "preço_compra_mercadoria " << wallet.getCoins() << std::endl;
-    //cout << "preço_caravana " << wallet.getCoins() << std::endl;
     cout << "instantes_entre_novos_barbaros " << timeBetweenBarbarians << std::endl;
     cout << "duracao_barbaros " << barbarianDuration << std::endl;
 }
 
-
-// Métodos pedidos da fase 2 ligados ao mapa/ambiente
 void Simulator::listCityCaravans(char cityName) const {
     City* city = map.getCityByName(cityName);
     if (city) {
         std::cout << "Listando caravanas na cidade " << cityName << ":\n";
         city->listCaravans();
     } else {
-        std::cout << "Erro: Cidade '" << cityName << "' não encontrada." << std::endl;
+        std::cout << "Erro: Cidade '" << cityName << "' nao encontrada." << std::endl;
     }
 }
 
 void Simulator::createSandstorm(int l, int c, int r) {
     cout << "Criando tempestade de areia no centro (" << l << ", " << c << ") com raio " << r << "." << endl;
 
-    // Percorre o quadrado definido pelo raio
     for (int i = l - r; i <= l + r; ++i) {
         for (int j = c - r; j <= c + r; ++j) {
-            // Ajusta as coordenadas para o comportamento circular
             auto [wrappedRow, wrappedCol] = map.wrapCoordinates(i, j);
 
-            // Verifica o que existe na célula
             char cellContent = map.getCell(wrappedRow, wrappedCol);
 
-            if (cellContent == 'C') { // Caravana do usuário
+            if (cellContent == 'C') {
                 cout << "Caravana afetada pela tempestade em (" << wrappedRow << ", " << wrappedCol << ")." << endl;
                 for (auto caravan : caravans) {
                     if (caravan->getRow() == wrappedRow && caravan->getCol() == wrappedCol) {
-                        caravan->loseCrew(10); // Reduz tripulantes
+                        caravan->loseCrew(10);
                         if (!caravan->isActive()) {
-                            caravan->becomeObstacle(map); // Torna-se obstáculo se inativa
+                            caravan->becomeObstacle(map);
                         }
                     }
                 }
-            } else if (cellContent == '!') { // Caravana bárbara
-                cout << "Caravana bárbara afetada pela tempestade em (" << wrappedRow << ", " << wrappedCol << ")." << endl;
+            } else if (cellContent == '!') {
+                cout << "Caravana barbara afetada pela tempestade em (" << wrappedRow << ", " << wrappedCol << ")." << endl;
                 for (auto caravan : caravans) {
                     if (caravan->getRow() == wrappedRow && caravan->getCol() == wrappedCol) {
-                        caravan->loseCrew(10); // Reduz tripulantes
+                        caravan->loseCrew(10);
                         if (!caravan->isActive()) {
-                            caravan->becomeObstacle(map); // Torna-se obstáculo se inativa
+                            caravan->becomeObstacle(map);
                         }
                     }
                 }

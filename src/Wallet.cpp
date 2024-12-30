@@ -21,10 +21,3 @@ bool Wallet::deductCoins(int amount) {
     }
     return false;
 }
-
-// Adiciona uma percentagem das moedas atuais
-void Wallet::addPercentageCoins(float percentage) {
-    int bonus = static_cast<int>(coins * (percentage / 100.0f));
-    addCoins(bonus);
-    std::cout << "[Wallet] Adicionadas " << bonus << " moedas (bónus de " << percentage << "%).\n";
-}

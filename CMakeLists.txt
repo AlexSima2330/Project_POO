@@ -3,7 +3,7 @@ project(Project_POO)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories(include) #procura os ficheiros .h auto
+include_directories(include)
 
 set(SOURCE_FILES
         src/main.cpp

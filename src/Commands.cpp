@@ -1,6 +1,3 @@
-//
-// Created by Alexa on 18/12/2024.
-//
 #include "Commands.h"
 #include "Simulator.h"
 #include <iostream>
@@ -10,11 +7,11 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
     if (command.find("prox") == 0) {
         std::istringstream iss(command);
         std::string cmd;
-        int n = 1; // Valor padrão de 1 instante
+        int n = 1;
         iss >> cmd >> n;
 
         if (n <= 0) {
-            std::cout << "Erro: O número de instantes deve ser maior que 0." << std::endl;
+            std::cout << "Erro: O numero de instantes deve ser maior que 0." << std::endl;
         } else {
             sim.advanceSimulation(n);
         }
@@ -27,7 +24,7 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         if (!iss.fail()) {
             sim.buyCaravan(cityName, type);
         } else {
-            std::cout << "Erro: Uso inválido do comando 'comprac'. Uso correto: comprac <C> <T>" << std::endl;
+            std::cout << "Erro: Uso invalido do comando 'comprac'. Uso correto: comprac <C> <T>" << std::endl;
         }
     } else if (command == "precos") {
         sim.showPrices();
@@ -43,23 +40,23 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         int caravanId;
         iss >> cmd >> caravanId;
         sim.showCaravanDetails(caravanId);
-    } else if (command.rfind("compra ", 0) == 0) { // Verifica se começa com "compra "
+    } else if (command.rfind("compra ", 0) == 0) {
         std::istringstream iss(command);
         std::string cmd;
         int caravanId, quantity;
 
-        iss >> cmd >> caravanId >> quantity; // Extrai o comando, o ID da caravana e a quantidade
+        iss >> cmd >> caravanId >> quantity;
         if (!iss.fail() && !cmd.empty() && quantity > 0) {
             sim.buyMerchandise(caravanId, quantity);
         } else {
-            std::cout << "Erro: Formato inválido para o comando 'compra'. Use: compra <caravanId> <quantidade>" << std::endl;
+            std::cout << "Erro: Formato invalido para o comando 'compra'. Use: compra <caravanId> <quantidade>" << std::endl;
         }
-    } else if (command.rfind("vende ", 0) == 0) { // Verifica se começa com "vende "
+    } else if (command.rfind("vende ", 0) == 0) {
         std::istringstream iss(command);
         std::string cmd;
         int caravanId;
 
-        iss >> cmd >> caravanId; // Extrai o comando e o ID da caravana
+        iss >> cmd >> caravanId;
         if (!iss.fail() && !cmd.empty()) {
             sim.sellMerchandise(caravanId);
         } else {
@@ -98,15 +95,15 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
         if (!iss.fail()) {
             sim.createSandstorm(l, c, r);
         } else {
-            std::cout << "Erro: Comando 'areia' inválido. Uso: areia <linha> <coluna> <raio>" << std::endl;
+            std::cout << "Erro: Comando 'areia' invalido. Uso: areia <linha> <coluna> <raio>" << std::endl;
         }
     } else if (command.find("moedas") == 0) {
         std::istringstream iss(command);
         std::string cmd; iss >> cmd;
         int n; iss >> n;
 
-        sim.addCoins(n); // Atualiza moedas
-        sim.checkAndEndSimulation(); // Verifica se deve terminar
+        sim.addCoins(n);
+        sim.checkAndEndSimulation();
     } else if (command.find("tripul") == 0) {
         std::istringstream iss(command);
         std::string cmd;
@@ -150,7 +147,7 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
     } else if (command == "terminar") {
         sim.endSimulation();
         std::cout << "A simulacao terminou. Voltando a fase 1..." << std::endl;
-        return; // Sinaliza o fim da simulação
+        // Fim da simulação
     } else if (command.find("invisible") == 0) {
         std::istringstream iss(command);
         std::string cmd;
@@ -163,7 +160,7 @@ void processPhase2Command(Simulator &sim, const std::string &command) {
                 return;
             }
         }
-        std::cout << "Erro: Caravana secreta com ID " << caravanId << " não encontrada ou não é do tipo Secret." << std::endl;
+        std::cout << "Erro: Caravana secreta com ID " << caravanId << " nao encontrada ou nao é do tipo Secret." << std::endl;
     } else {
         std::cout << "Comando invalido." << std::endl;
     }

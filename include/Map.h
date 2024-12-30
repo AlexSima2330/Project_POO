@@ -14,36 +14,29 @@ private:
     int rows;
     int cols;
     vector<char> grid;
-    vector<City> cities; // Vetor de cidades no mapa
+    vector<City> cities;
     int index(int row, int col) const;
 
 public:
     Map(int rows, int cols);
-    std::vector<City>& getCities();              // Acesso não constante
+    std::vector<City>& getCities();
     const std::vector<City>& getCities() const;
 
-    // Método para ajustar coordenadas para o comportamento circular
     pair<int, int> wrapCoordinates(int row, int col) const;
 
-    // Função para carregar o mapa de um ficheiro
     bool loadFromFile(const string& filename);
 
-    // Função para exibir o mapa
     void display() const;
 
-    // Getter para verificar o conteúdo de uma célula
     char getCell(int row, int col) const;
 
-    // Setter para modificar o conteúdo de uma célula
     void setCell(int row, int col, char value);
 
-    // Métodos para gerir cidades
     void addCity(char name, int row, int col);
     City* getCityByName(char name) const;
     City* getCityAt(int row, int col);
     bool isCity(int row, int col) const;
 
-    // Getters para dimensões
     int getRows() const { return rows; }
     int getCols() const { return cols; }
 };

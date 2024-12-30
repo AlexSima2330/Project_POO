@@ -7,7 +7,7 @@
 
 #include <string>
 
-class Simulator; // forward declaration
+class Simulator;
 
 void processPhase2Command(Simulator &sim, const std::string &command);
 

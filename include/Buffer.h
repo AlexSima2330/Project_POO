@@ -4,13 +4,13 @@
 class Buffer {
 private:
     int rows, cols;
-    char** screen; // array bidimensional
+    char** screen;
     int cursorRow, cursorCol;
 
 public:
-    Buffer(); // Construtor padrão
+    Buffer();
     Buffer(int rows, int cols);
-    Buffer(const Buffer &other);            // Construtor de cópia
+    Buffer(const Buffer &other);
     Buffer& operator=(const Buffer &other);
     ~Buffer();
     void clear();
@@ -19,7 +19,6 @@ public:
     void putChar(char c);
     void putString(const char *str);
 
-    // Operadores <<
     friend Buffer& operator<<(Buffer &buffer, const char *str);
     friend Buffer& operator<<(Buffer &buffer, int num);
     friend Buffer& operator<<(Buffer &buffer, char c);
