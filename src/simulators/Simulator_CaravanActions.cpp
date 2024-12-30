@@ -246,23 +246,91 @@ void Simulator::setCaravanAuto(int caravanId) {
 
 
 void Simulator::handleTradeCaravanAuto(Caravan* caravan) {
-    // Exemplo: Se estiver próximo de outra caravana ou item
+    if (caravan->getType() != "Trade") return;
+
     int row = caravan->getRow();
     int col = caravan->getCol();
+    Item* nearestItem = nullptr;
+    Caravan* nearestCaravan = nullptr;
+    int minItemDistance = 3;
+    int minCaravanDistance = 3;
 
-    // Buscar caravanas amigas ou itens próximos
-    for (auto& otherCaravan : caravans) {
-        if (otherCaravan != caravan && abs(otherCaravan->getRow() - row) <= 2 &&
-            abs(otherCaravan->getCol() - col) <= 2) {
-            // Tenta mover para uma posição adjacente amigável
-            std::cout << "Caravana de Comercio " << caravan->getId()
-                      << " movendo-se para proteçao ou pegar itens." << std::endl;
-            return;
-            }
+    // 1️⃣ Procurar itens próximos
+    for (auto& item : items) {
+        int itemRow = item->getRow();
+        int itemCol = item->getCol();
+        int distance = std::max(std::abs(itemRow - row), std::abs(itemCol - col));
+
+        if (distance <= 2 && distance < minItemDistance) {
+            nearestItem = item;
+            minItemDistance = distance;
+        }
     }
+
+    // 2️⃣ Mover em direção ao item mais próximo
+    if (nearestItem) {
+        int targetRow = nearestItem->getRow();
+        int targetCol = nearestItem->getCol();
+
+        if (targetRow > row) {
+            moveCaravanWithDirection(caravan->getId(), "B");
+        } else if (targetRow < row) {
+            moveCaravanWithDirection(caravan->getId(), "C");
+        }
+
+        if (targetCol > col) {
+            moveCaravanWithDirection(caravan->getId(), "D");
+        } else if (targetCol < col) {
+            moveCaravanWithDirection(caravan->getId(), "E");
+        }
+
+        std::cout << "[TradeCaravan] ID: " << caravan->getId()
+                  << " moveu-se para apanhar item em (" << targetRow << ", " << targetCol << ")." << std::endl;
+        return;
+    }
+
+    // 3️⃣ Procurar outra caravana amiga próxima
+    for (auto& otherCaravan : caravans ) {
+        if (otherCaravan != caravan && otherCaravan->isOwned() && !otherCaravan->isCurrentlyInvisible()) {
+            int otherRow = otherCaravan->getRow();
+            int otherCol = otherCaravan->getCol();
+            int distance = std::max(std::abs(otherRow - row), std::abs(otherCol - col));
+
+            if (distance <= 2 && distance < minCaravanDistance) {
+                nearestCaravan = otherCaravan;
+                minCaravanDistance = distance;
+            }
+        }
+    }
+
+    // 4️⃣ Mover em direção à caravana amiga mais próxima
+    if (nearestCaravan) {
+        int targetRow = nearestCaravan->getRow();
+        int targetCol = nearestCaravan->getCol();
+
+        if (targetRow > row) {
+            moveCaravanWithDirection(caravan->getId(), "B");
+        } else if (targetRow < row) {
+            moveCaravanWithDirection(caravan->getId(), "C");
+        }
+
+        if (targetCol > col) {
+            moveCaravanWithDirection(caravan->getId(), "D");
+        } else if (targetCol < col) {
+            moveCaravanWithDirection(caravan->getId(), "E");
+        }
+
+        std::cout << "[TradeCaravan] ID: " << caravan->getId()
+                  << " moveu-se para proteção próxima da caravana ID: " << nearestCaravan->getId()
+                  << "." << std::endl;
+        return;
+    }
+
+    std::cout << "[TradeCaravan] ID: " << caravan->getId()
+              << " não encontrou itens ou caravanas próximas." << std::endl;
 }
+
 void Simulator::handleMilitaryCaravanAuto(Caravan* caravan) {
-    // Coordenadas da caravana militar
     int caravanRow = caravan->getRow();
     int caravanCol = caravan->getCol();
 
@@ -277,25 +345,89 @@ void Simulator::handleMilitaryCaravanAuto(Caravan* caravan) {
                           << " encontrou um bárbaro na posição (" << barbarianRow << ", " << barbarianCol << ")."
                           << std::endl;
 
-                // Movimento em direção ao bárbaro
+                // Movimento validado usando moveCaravanWithDirection
                 if (barbarianRow > caravanRow) {
-                    caravan->move("B"); // Para baixo
+                    moveCaravanWithDirection(caravan->getId(), "B");
                 } else if (barbarianRow < caravanRow) {
-                    caravan->move("C"); // Para cima
+                    moveCaravanWithDirection(caravan->getId(), "C");
                 }
 
                 if (barbarianCol > caravanCol) {
-                    caravan->move("D"); // Para a direita
+                    moveCaravanWithDirection(caravan->getId(), "D");
                 } else if (barbarianCol < caravanCol) {
-                    caravan->move("E"); // Para a esquerda
+                    moveCaravanWithDirection(caravan->getId(), "E");
                 }
 
-                return; // Sai após mover-se
+                return;
             }
         }
     }
 
     std::cout << "Caravana Militar " << caravan->getId() << " não encontrou bárbaros próximos." << std::endl;
+}
+
+void Simulator::handleSecretCaravanAuto(Caravan* caravan) {
+    if (caravan->getType() != "Secret") return;
+
+    // Armazena a posição inicial
+    int oldRow = caravan->getRow();
+    int oldCol = caravan->getCol();
+
+    std::cout << "[DEBUG] [SecretCaravan] ID: " << caravan->getId()
+              << " na posição inicial (" << oldRow << ", " << oldCol << ") iniciando movimento automático." << std::endl;
+
+    // 1️⃣ Invisível → Não se move
+    if (caravan->isCurrentlyInvisible()) {
+        std::cout << "[DEBUG] [SecretCaravan] ID: " << caravan->getId()
+                  << " está invisível e não se move neste turno." << std::endl;
+        return;
+    }
+
+    // 2️⃣ Sem Tripulantes → Torna-se obstáculo
+    if (caravan->getCrew() == 0) {
+        caravan->becomeObstacle(map);
+        std::cout << "[DEBUG] [SecretCaravan] ID: " << caravan->getId()
+                  << " ficou sem tripulantes e tornou-se um obstáculo permanente no mapa." << std::endl;
+        return;
+    }
+
+    // 3️⃣ Movimento Aleatório com Movimento Especial
+    std::vector<std::string> directions = {"2D", "2E", "2C", "2B"};
+    bool moved = false;
+
+    for (int i = 0; i < 3; ++i) {
+        std::string randomDirection = directions[rand() % directions.size()];
+        std::cout << "[DEBUG] [SecretCaravan] Tentativa " << (i + 1)
+                  << ": direção " << randomDirection << std::endl;
+
+        moveCaravanWithDirection(caravan->getId(), randomDirection);
+
+        // Comparar com a posição inicial (oldRow e oldCol)
+        if (caravan->getRow() != oldRow || caravan->getCol() != oldCol) {
+            std::cout << "[DEBUG] [SecretCaravan] Movimento bem-sucedido para ("
+                      << caravan->getRow() << ", " << caravan->getCol() << ") na direção: "
+                      << randomDirection << std::endl;
+            moved = true;
+            break;
+        } else {
+            std::cout << "[ERROR] [SecretCaravan] Falha ao mover-se para direção: "
+                      << randomDirection << std::endl;
+        }
+    }
+
+    // 4️⃣ Atualizar Mapa após Movimento
+    int newRow = caravan->getRow();
+    int newCol = caravan->getCol();
+
+    if (moved) {
+        map.setCell(oldRow, oldCol, '.'); // Limpa a posição antiga
+        map.setCell(newRow, newCol, '0' + caravan->getId()); // Atualiza a nova posição
+
+        std::cout << "[DEBUG] [SecretCaravan] Mapa atualizado com nova posição ("
+                  << newRow << ", " << newCol << ")." << std::endl;
+    } else {
+        std::cout << "[ERROR] [SecretCaravan] A posição não foi atualizada no mapa." << std::endl;
+    }
 }
 
 
@@ -445,7 +577,7 @@ void Simulator::handleBarbarianCaravanAuto(BarbarianCaravan* caravan) {
     // 🎯 **1. Verificar se há uma caravana na mesma linha ou coluna dentro do raio de 8 posições**
     Caravan* target = nullptr;
     for (auto& other : caravans) {
-        if (other->getType() != "Barbarian") {
+        if (other->getType() != "Barbarian"  && !other->isCurrentlyInvisible()) {
             int targetRow = other->getRow();
             int targetCol = other->getCol();
 

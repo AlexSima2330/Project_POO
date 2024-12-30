@@ -176,6 +176,8 @@ void Simulator::advanceSimulation(int n) {
                     handleTradeCaravanAuto(caravan);
                 } else if (caravan->getType() == "Military") {
                     handleMilitaryCaravanAuto(caravan);
+                } else if (caravan->getType() == "Secret") {
+                    handleSecretCaravanAuto(caravan);
                 }
             }
 

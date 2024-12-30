@@ -107,11 +107,11 @@ void Caravan::status() const {
 // Construtor da classe TradeCaravan
 TradeCaravan::TradeCaravan(int id, int initialCrew)
     : Caravan(id, "Trade") {
-    maxCargo = 5;       // Capacidade máxima de carga para TradeCaravan
-    maxWater = 5;      // Capacidade máxima de água
+    maxCargo = 40;       // Capacidade máxima de carga para TradeCaravan
+    maxWater = 200;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;
-    cargo = 2;// Número inicial de tripulantes
+    cargo = 20;// Número inicial de tripulantes
 }
 
 int TradeCaravan::consumeWater() const {
@@ -135,19 +135,19 @@ void TradeCaravan::move(const std::string& direction) {
 MilitaryCaravan::MilitaryCaravan(int id, int initialCrew)
     : Caravan(id, "Military") {
     maxCargo = 5;        // Capacidade máxima de carga para MilitaryCaravan
-    maxWater = 2;      // Capacidade máxima de água
+    maxWater = 400;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;
-    cargo = 3;// Número inicial de tripulantes
+    cargo = 40;// Número inicial de tripulantes
 }
 
 SecretCaravan::SecretCaravan(int id, int initialCrew)
     : Caravan(id, "Secret") {
-    maxCargo = 5;        // Capacidade máxima de carga para MilitaryCaravan
-    maxWater = 5;      // Capacidade máxima de água
+    maxCargo = 10;        // Capacidade máxima de carga para MilitaryCaravan
+    maxWater = 250;      // Capacidade máxima de água
     water = maxWater;    // Inicia com tanque cheio
     crew = initialCrew;
-    cargo = 3;// Número inicial de tripulantes
+    cargo = 25;// Número inicial de tripulantes
 }
 
 int SecretCaravan::consumeWater() const {
@@ -176,7 +176,7 @@ void MilitaryCaravan::move(const std::string& direction) {
 }
 
 void SecretCaravan::move(const std::string& direction) {
-    cout << "[MilitaryCaravan] ID: " << id << " a mover-se para " << direction << "." << endl;
+    cout << "[SecretCaravan] ID: " << id << " a mover-se para " << direction << "." << endl;
     Caravan::move(direction);
 }
 
@@ -248,7 +248,7 @@ void Caravan::moveRandomly(Map& map) {
         row = oldRow;
         col = oldCol;
         std::cout << "[TradeCaravan] ID: " << id
-                  << " não conseguiu mover-se aleatoriamente devido a um obstáculo." << std::endl;
+                  << " não conseguiu mover-se aleatoriamente devido a um obstaculo." << std::endl;
     }
 }
 

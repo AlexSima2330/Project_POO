@@ -70,6 +70,7 @@ public:
     void setCaravanAuto(int caravanId);
     void handleTradeCaravanAuto(Caravan* caravan);
     void handleMilitaryCaravanAuto(Caravan* caravan);
+    void handleSecretCaravanAuto(Caravan* caravan);
     void handleCaravanWithoutCrew(Caravan* caravan);
     void stopCaravanAuto(int caravanId);
     void createBarbarianCaravan(int l, int c);
